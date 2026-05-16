@@ -1,85 +1,119 @@
-import type { Metadata } from 'next';
-import './globals.css';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import type { Metadata } from "next";
+import "./globals.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tools.zspace.in'),
+  metadataBase: new URL("https://tools.zspace.in"),
   title: {
-    default: 'ZSpace Tools — Free Online Tools for Business & Finance',
-    template: '%s | ZSpace Tools',
+    default: "ZSpace Tools — Free Online Tools for Business & Finance",
+    template: "%s | ZSpace Tools",
   },
   description:
-    'ZSpace Tools offers free, fast, and accurate online calculators and tools for GST, tax, finance, SEO, and more — built for Indian businesses.',
+    "ZSpace Tools offers free, fast, and accurate online calculators and tools for GST, tax, finance, SEO, and more — built for Indian businesses.",
   keywords: [
-    'free online tools',
-    'GST calculator',
-    'tax calculator India',
-    'business tools',
-    'finance calculator',
-    'ZSpace',
+    "free online tools",
+    "GST calculator",
+    "tax calculator India",
+    "business tools",
+    "finance calculator",
+    "ZSpace",
   ],
-  authors: [{ name: 'ZSpace', url: 'https://tools.zspace.in' }],
-  creator: 'ZSpace',
-  publisher: 'ZSpace',
+  authors: [{ name: "ZSpace", url: "https://tools.zspace.in" }],
+  creator: "ZSpace",
+  publisher: "ZSpace",
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large' },
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+    },
   },
   openGraph: {
-    type: 'website',
-    locale: 'en_IN',
-    url: 'https://tools.zspace.in',
-    siteName: 'ZSpace Tools',
-    title: 'ZSpace Tools — Free Online Tools for Business & Finance',
-    description: 'Free, fast, and accurate online calculators built for Indian businesses.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'ZSpace Tools' }],
+    type: "website",
+    locale: "en_IN",
+    url: "https://tools.zspace.in",
+    siteName: "ZSpace Tools",
+    title: "ZSpace Tools — Free Online Tools for Business & Finance",
+    description:
+      "Free, fast, and accurate online calculators built for Indian businesses.",
+    images: [
+      { url: "/og-image.png", width: 1200, height: 630, alt: "ZSpace Tools" },
+    ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'ZSpace Tools — Free Online Tools',
-    description: 'Free online calculators and tools for business, GST, finance, and more.',
-    images: ['/og-image.png'],
-    creator: '@zspace_in',
+    card: "summary_large_image",
+    title: "ZSpace Tools — Free Online Tools",
+    description:
+      "Free online calculators and tools for business, GST, finance, and more.",
+    images: ["/og-image.png"],
+    creator: "@zspace_in",
   },
   alternates: {
-    canonical: 'https://tools.zspace.in',
+    canonical: "https://tools.zspace.in",
   },
   icons: {
-    icon: '/favicon.svg',
-    apple: '/apple-touch-icon.png',
+    icon: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
   },
-  manifest: '/site.webmanifest',
+  manifest: "/site.webmanifest",
   verification: {
-    google: 'your-google-verification-code',
+    google: "your-google-verification-code",
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en-IN">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: 'ZSpace Tools',
-              url: 'https://tools.zspace.in',
-              description: 'Free online tools for business and finance in India.',
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "ZSpace Tools",
+              url: "https://tools.zspace.in",
+              description:
+                "Free online tools for business and finance in India.",
               potentialAction: {
-                '@type': 'SearchAction',
-                target: 'https://tools.zspace.in/search?q={search_term_string}',
-                'query-input': 'required name=search_term_string',
+                "@type": "SearchAction",
+                target: "https://tools.zspace.in/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
               },
             }),
           }}
         />
+
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-5VHD1R0KP2"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){window.dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-5VHD1R0KP2');
+          `}
+        </Script>
       </head>
       <body className="bg-gray-50 antialiased">
         <Header />
