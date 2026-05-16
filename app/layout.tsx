@@ -80,6 +80,10 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        <meta
+          name="google-site-verification"
+          content="g1CFVm17mGpVIJmAf6vaq1pViTaQBbso8Xf4rI3--qI"
+        />
         {/* Structured Data */}
         <script
           type="application/ld+json"
