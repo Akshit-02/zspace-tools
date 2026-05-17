@@ -1,13 +1,13 @@
 "use client";
-import { useState, useCallback } from "react";
 import {
-  Receipt,
-  Info,
-  RotateCcw,
-  Copy,
   Check,
+  Copy,
   IndianRupee,
+  Info,
+  Receipt,
+  RotateCcw,
 } from "lucide-react";
+import { useCallback, useState } from "react";
 
 const GST_SLABS = [0, 5, 12, 18, 28];
 

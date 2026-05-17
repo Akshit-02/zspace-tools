@@ -1,14 +1,14 @@
 "use client";
-import { useState, useMemo } from "react";
 import {
-  IndianRupee,
-  Percent,
   Calendar,
-  Copy,
   Check,
-  RotateCcw,
+  Copy,
+  IndianRupee,
   Info,
+  Percent,
+  RotateCcw,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 
 function formatINR(n: number) {
   return new Intl.NumberFormat("en-IN", {
