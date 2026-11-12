@@ -1,26 +1,292 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   ZSpace Tools — design tokens
+   Warm Ivory canvas · Charcoal type · Burnt Orange accent
+------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory: #faf7f2;
+  --ivory-2: #f2ece3;
+  --charcoal: #252525;
+  --orange: #f07845;
+  /* Darker orange used only where orange must work as small text (AA 4.6:1). */
+  --orange-ink: #b4532a;
+  --orange-wash: #fbe9df;
+  --line: #e8ded2;
+  --line-strong: #d9ccbc;
+  --ink-2: #77716b;
+  --ink-3: #99928b;
+  --card: #ffffff;
+  --success: #39845b;
+  --error: #c84d43;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ivory: var(--ivory);
+  --color-ivory-2: var(--ivory-2);
+  --color-charcoal: var(--charcoal);
+  --color-orange: var(--orange);
+  --color-orange-ink: var(--orange-ink);
+  --color-orange-wash: var(--orange-wash);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-card: var(--card);
+  --color-success: var(--success);
+  --color-error: var(--error);
+
+  --font-display: var(--font-clash), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-ui: 12px;
+  --ease-out: var(--ease-out);
+
+  /* Display scale (fluid) */
+  --text-hero: clamp(2.75rem, 1.6rem + 4.6vw, 5rem);
+  --text-hero--line-height: 0.98;
+  --text-hero--letter-spacing: -0.035em;
+  --text-h1: clamp(2.375rem, 1.7rem + 2.7vw, 3.75rem);
+  --text-h1--line-height: 1.02;
+  --text-h1--letter-spacing: -0.03em;
+  --text-tool: clamp(2.125rem, 1.7rem + 1.7vw, 3rem);
+  --text-tool--line-height: 1.05;
+  --text-tool--letter-spacing: -0.025em;
+  --text-h2: clamp(1.875rem, 1.55rem + 1.2vw, 2.5rem);
+  --text-h2--line-height: 1.08;
+  --text-h2--letter-spacing: -0.02em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 88px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ivory);
+  color: var(--charcoal);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-feature-settings: "ss01", "kern";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--orange);
+  color: var(--charcoal);
+}
+
+:focus-visible {
+  outline: 2px solid var(--charcoal);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+
+/* Fine paper grain via layered gradients — no image request. */
+.paper-rule {
+  background-image: linear-gradient(to right, var(--line) 1px, transparent 1px);
+  background-size: 25% 100%;
+}
+
+.dotgrid {
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* Checkerboard used behind transparent previews */
+.checker {
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #f1ebe2 25%, transparent 25%),
+    linear-gradient(-45deg, #f1ebe2 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f1ebe2 75%),
+    linear-gradient(-45deg, transparent 75%, #f1ebe2 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+/* Range input */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+  --fill: 50%;
+}
+.range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--charcoal) var(--fill), var(--line) var(--fill));
+}
+.range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+}
+.range::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--charcoal);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 2px solid var(--charcoal);
+  box-shadow: 0 0 0 4px var(--ivory);
+  transition: transform 150ms var(--ease-out);
+}
+.range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 2px solid var(--charcoal);
+}
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+  border-color: var(--orange);
+}
+.range:focus-visible {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+/* Long-form article typography */
+.prose-z {
+  color: var(--charcoal);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.prose-z > * + * {
+  margin-top: 1.15em;
+}
+.prose-z h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin-top: 2.2em;
+}
+.prose-z h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin-top: 1.8em;
+}
+.prose-z a {
+  color: var(--charcoal);
+  text-decoration: underline;
+  text-decoration-color: var(--orange);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.prose-z a:hover {
+  color: var(--orange-ink);
+}
+.prose-z ul,
+.prose-z ol {
+  padding-left: 1.25rem;
+}
+.prose-z ul {
+  list-style: none;
+  padding-left: 0;
+}
+.prose-z ul > li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+.prose-z ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.72em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--orange);
+}
+.prose-z ol {
+  list-style: decimal;
+}
+.prose-z ol > li::marker {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--ink-2);
+}
+.prose-z li + li {
+  margin-top: 0.45em;
+}
+.prose-z strong {
+  font-weight: 700;
+}
+.prose-z code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--ivory-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.1em 0.35em;
+}
+.prose-z table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.prose-z th,
+.prose-z td {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.prose-z th {
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
