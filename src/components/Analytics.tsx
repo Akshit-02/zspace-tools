@@ -2,6 +2,23 @@ import Script from "next/script";
 import { analyticsConfig } from "@/lib/site";
 
 /** Loads GTM or GA4 only when configured via env. Nothing loads otherwise. */
+/** GTM's no-JavaScript fallback; must sit at the top of <body>. */
+export function AnalyticsNoScript() {
+  const { gtmId } = analyticsConfig;
+  if (!gtmId) return null;
+  return (
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(gtmId)}`}
+        height="0"
+        width="0"
+        style={{ display: "none", visibility: "hidden" }}
+        title="Google Tag Manager"
+      />
+    </noscript>
+  );
+}
+
 export function Analytics() {
   const { gaId, gtmId } = analyticsConfig;
   if (gtmId) {

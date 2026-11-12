@@ -31,7 +31,8 @@ export const limits = {
 
 export const analyticsConfig = {
   gaId: process.env.NEXT_PUBLIC_GA_ID || "",
-  gtmId: process.env.NEXT_PUBLIC_GTM_ID || "",
+  // Google Tag Manager container. GA4 is configured inside this container.
+  gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-PXPCMNMB",
   gscVerification: process.env.NEXT_PUBLIC_GSC_VERIFICATION || "",
 } as const;
 

@@ -4,7 +4,7 @@ import { clash, satoshi, jetbrains } from "./fonts";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Providers } from "@/components/Providers";
-import { Analytics } from "@/components/Analytics";
+import { Analytics, AnalyticsNoScript } from "@/components/Analytics";
 import { JsonLd } from "@/components/JsonLd";
 import { site, analyticsConfig } from "@/lib/site";
 import { graph, organizationLd, websiteLd } from "@/lib/seo";
@@ -41,6 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${clash.variable} ${satoshi.variable} ${jetbrains.variable}`}>
       <body className="flex min-h-dvh flex-col">
+        <AnalyticsNoScript />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-[10px] focus:bg-charcoal focus:px-4 focus:py-2 focus:text-ivory"
