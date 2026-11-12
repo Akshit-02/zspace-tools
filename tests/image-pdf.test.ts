@@ -1,0 +1,24 @@
+import { layoutPage, type PdfPageSettings } from "../src/lib/image-pdf";
+let fails = 0;
+const t = (n: string, c: boolean, info?: unknown) => { if (!c) fails++; console.log(`${c ? "PASS" : "FAIL"} ${n}`, c ? "" : info); };
+const S: PdfPageSettings = { size: "a4", customW: 100, customH: 150, orientation: "auto", margin: 0, placement: "fit" };
+const near = (a: number, b: number) => Math.abs(a - b) < 0.01;
+
+let l = layoutPage(4000, 3000, S);
+t("auto → landscape A4 for landscape image", near(l.pageW, 841.89) && near(l.pageH, 595.28), l);
+t("fit keeps aspect", near(l.w / l.h, 4 / 3), l);
+t("fit inside page", l.w <= l.pageW + 0.01 && l.h <= l.pageH + 0.01, l);
+l = layoutPage(4000, 3000, { ...S, orientation: "portrait", margin: 12 });
+t("forced portrait", near(l.pageW, 595.28), l);
+t("margin respected", near(l.x, 12 * 72 / 25.4) && l.w <= l.pageW - 2 * 12 * 72 / 25.4 + 0.01, l);
+l = layoutPage(4000, 3000, { ...S, orientation: "portrait", placement: "fill" });
+t("fill covers box", l.w >= l.box.w - 0.01 && l.h >= l.box.h - 0.01 && near(l.w / l.h, 4 / 3), l);
+l = layoutPage(200, 100, { ...S, placement: "original" });
+t("original = 96dpi size, centred", near(l.w, 150) && near(l.h, 75) && near(l.x, (l.pageW - 150) / 2), l);
+l = layoutPage(800, 600, { ...S, size: "fit", margin: 0 });
+t("fit-to-image page = image at 96dpi", near(l.pageW, 600) && near(l.pageH, 450) && near(l.x, 0), l);
+l = layoutPage(800, 600, { ...S, size: "letter", orientation: "portrait" });
+t("letter portrait", near(l.pageW, 612) && near(l.pageH, 792), l);
+l = layoutPage(800, 600, { ...S, size: "custom", customW: 100, customH: 150, orientation: "landscape" });
+t("custom landscape swaps", near(l.pageW, 150 * 72 / 25.4) && near(l.pageH, 100 * 72 / 25.4), l);
+if (fails) process.exitCode = 1;

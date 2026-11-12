@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ZMark } from "./Logo";
 import { site, legalNav } from "@/lib/site";
-import { categories, tools, toolPath, toolsInCategory } from "@/lib/tools";
+import { categories, getTool, tools, toolPath, toolsInCategory, type Tool } from "@/lib/tools";
+import { footerSlugs } from "@/lib/home";
 
 export function Footer() {
   const liveCategories = categories.filter((c) => toolsInCategory(c.id).length > 0);
@@ -25,12 +26,17 @@ export function Footer() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
-            <FooterCol title="Tools" links={tools.map((t) => ({ label: t.name, href: toolPath(t.slug) }))} />
+            <FooterCol
+              title="Tools"
+              links={[
+                ...footerSlugs.map(getTool).filter((t): t is Tool => Boolean(t)).map((t) => ({ label: t.name, href: toolPath(t.slug) })),
+                { label: `All ${tools.length} tools →`, href: "/all-tools/" },
+              ]}
+            />
             <FooterCol
               title="Categories"
               links={[
                 ...liveCategories.map((c) => ({ label: c.name, href: `/all-tools/#${c.id}` })),
-                { label: "All tools", href: "/all-tools/" },
               ]}
             />
             <FooterCol

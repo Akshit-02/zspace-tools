@@ -10,7 +10,7 @@ import { Logo } from "./Logo";
 import { SearchPalette } from "./SearchPalette";
 import { ToolIcon } from "./ToolIcon";
 import { mainNav } from "@/lib/site";
-import { tools, toolPath } from "@/lib/tools";
+import { categories, toolPath, toolsInCategory } from "@/lib/tools";
 
 const desktopNav = mainNav.filter((n) => n.label !== "Blog");
 
@@ -154,21 +154,27 @@ export function Navbar() {
                     </motion.li>
                   ))}
                 </ul>
-                <p className="mb-3 mt-8 text-xs font-medium uppercase tracking-[0.14em] text-ink-2">Tools</p>
-                <ul className="grid gap-2">
-                  {tools.map((tool) => (
-                    <li key={tool.slug}>
-                      <Link
-                        href={toolPath(tool.slug)}
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-3 rounded-[12px] border border-line bg-card px-3 py-3"
-                      >
-                        <ToolIcon name={tool.icon} className="size-[18px] text-orange-ink" />
-                        <span className="font-medium">{tool.name}</span>
-                      </Link>
-                    </li>
+                {categories
+                  .filter((c) => toolsInCategory(c.id).length > 0)
+                  .map((c) => (
+                    <div key={c.id} className="mt-7">
+                      <p className="mb-2.5 text-xs font-medium uppercase tracking-[0.14em] text-ink-2">{c.name}</p>
+                      <ul className="grid grid-cols-2 gap-2">
+                        {toolsInCategory(c.id).map((tool) => (
+                          <li key={tool.slug} className="min-w-0">
+                            <Link
+                              href={toolPath(tool.slug)}
+                              onClick={() => setMenuOpen(false)}
+                              className="flex h-full items-center gap-2.5 rounded-[12px] border border-line bg-card px-3 py-2.5"
+                            >
+                              <ToolIcon name={tool.icon} className="size-4 shrink-0 text-orange-ink" />
+                              <span className="min-w-0 text-[0.9rem] font-medium leading-tight">{tool.name}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
               </nav>
             </motion.div>
           )}

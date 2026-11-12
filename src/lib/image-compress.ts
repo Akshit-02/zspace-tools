@@ -28,52 +28,9 @@ export interface CompressResult {
   keptOriginal: boolean;
 }
 
-export const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+import { canvasToBlob, decodeImage, dims, extensionFor, normaliseType, releaseImage, MAX_CANVAS_PIXELS, type Decoded } from "./image-utils";
 
-export function normaliseType(file: File): string | null {
-  const t = file.type.toLowerCase();
-  if (t === "image/jpg" || t === "image/pjpeg") return "image/jpeg";
-  if ((ACCEPTED_TYPES as readonly string[]).includes(t)) return t;
-  // Some systems report an empty MIME type; fall back to the extension.
-  const ext = file.name.split(".").pop()?.toLowerCase();
-  if (!t && ext) {
-    if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
-    if (ext === "png") return "image/png";
-    if (ext === "webp") return "image/webp";
-  }
-  return null;
-}
-
-export function extensionFor(type: string) {
-  return type === "image/jpeg" ? "jpg" : type === "image/png" ? "png" : "webp";
-}
-
-async function decode(file: Blob): Promise<ImageBitmap | HTMLImageElement> {
-  if (typeof createImageBitmap === "function") {
-    try {
-      // 'from-image' applies EXIF orientation so phone photos stay upright.
-      return await createImageBitmap(file, { imageOrientation: "from-image" });
-    } catch {
-      // Fall through to <img> decoding (older Safari rejects the options bag).
-    }
-  }
-  const url = URL.createObjectURL(file);
-  try {
-    const img = new Image();
-    img.decoding = "async";
-    img.src = url;
-    await img.decode(); // modern browsers apply EXIF orientation to <img>
-    return img;
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
-
-function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number) {
-  return new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Encoding failed"))), type, quality),
-  );
-}
+export { extensionFor, normaliseType };
 
 /**
  * Maps the 10–100 quality slider to a PNG palette size (0 = lossless).
@@ -91,14 +48,13 @@ export async function compressImage(file: File, opts: CompressOptions): Promise<
   const inType = normaliseType(file);
   if (!inType) throw new Error("Unsupported format. Use JPG, PNG or WebP.");
 
-  let source: ImageBitmap | HTMLImageElement;
+  let source: Decoded;
   try {
-    source = await decode(file);
+    source = await decodeImage(file);
   } catch {
     throw new Error("This image couldn't be read. It may be damaged or not a real image file.");
   }
-  const srcW = "naturalWidth" in source ? source.naturalWidth : source.width;
-  const srcH = "naturalHeight" in source ? source.naturalHeight : source.height;
+  const { width: srcW, height: srcH } = dims(source);
   if (!srcW || !srcH) throw new Error("This image has no readable dimensions.");
 
   const scale = opts.maxDimension > 0 ? Math.min(1, opts.maxDimension / Math.max(srcW, srcH)) : 1;
@@ -107,7 +63,7 @@ export async function compressImage(file: File, opts: CompressOptions): Promise<
   const resized = scale < 1;
 
   // Browsers cap canvas area (≈16.7 MP on iOS Safari for some versions; larger elsewhere).
-  if (width * height > 50_000_000) throw new Error("This image is too large to process in the browser. Resize it first.");
+  if (width * height > MAX_CANVAS_PIXELS) throw new Error("This image is too large to process in the browser. Resize it first.");
 
   const outType = opts.format === "original" ? inType : opts.format === "webp" ? "image/webp" : "image/jpeg";
 
@@ -123,7 +79,7 @@ export async function compressImage(file: File, opts: CompressOptions): Promise<
   }
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(source, 0, 0, width, height);
-  if ("close" in source) source.close();
+  releaseImage(source);
 
   let blob: Blob;
   if (outType === "image/png") {

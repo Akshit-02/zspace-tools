@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { Check, Copy, UploadCloud } from "lucide-react";
+import { Check, Copy, UploadCloud, X } from "lucide-react";
 import { clsx } from "clsx";
 
 /* ------------------------------------------------------------------ */
@@ -400,5 +400,72 @@ export function ProgressBar({ value, label }: { value: number; label?: string })
         <motion.div className="h-full rounded-full bg-orange" animate={{ width: `${pct}%` }} transition={{ ease: "easeOut", duration: 0.3 }} />
       </div>
     </div>
+  );
+}
+
+/** Lists files that were skipped at upload, with reasons. */
+export function RejectionNotice({ list, onClose }: { list: string[]; onClose: () => void }) {
+  if (!list.length) return null;
+  return (
+    <Notice tone="error">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-medium">
+            {list.length} {list.length === 1 ? "file was" : "files were"} skipped
+          </p>
+          <ul className="mt-1 list-disc pl-4">
+            {list.slice(0, 6).map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+            {list.length > 6 && <li>…and {list.length - 6} more</li>}
+          </ul>
+        </div>
+        <button type="button" onClick={onClose} aria-label="Dismiss" className="shrink-0">
+          <X className="size-4" />
+        </button>
+      </div>
+    </Notice>
+  );
+}
+
+/** Small labelled metric used in results panels. */
+export function Metric({ label, value, tone }: { label: string; value: React.ReactNode; tone?: "good" | "bad" }) {
+  return (
+    <div className="rounded-[10px] bg-ivory px-3 py-2.5">
+      <dt className="text-xs text-ink-2">{label}</dt>
+      <dd className={clsx("mt-0.5 font-mono text-[0.9rem]", tone === "good" && "text-success", tone === "bad" && "text-error")}>{value}</dd>
+    </div>
+  );
+}
+
+/** Primary download action, consistent across tools. */
+export function DownloadButton({
+  onClick,
+  children,
+  disabled,
+  variant = "primary",
+  className,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  disabled?: boolean;
+  variant?: "primary" | "dark" | "secondary";
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={clsx(
+        "inline-flex h-11 items-center justify-center gap-2 rounded-[12px] px-4 font-medium transition-colors active:scale-[0.98] disabled:opacity-40",
+        variant === "primary" && "bg-orange text-charcoal hover:bg-[#ec6a34]",
+        variant === "dark" && "bg-charcoal text-ivory hover:bg-black",
+        variant === "secondary" && "border border-line-strong bg-card text-charcoal hover:border-charcoal",
+        className,
+      )}
+    >
+      {children}
+    </button>
   );
 }

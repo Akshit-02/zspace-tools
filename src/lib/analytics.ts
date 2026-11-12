@@ -11,7 +11,8 @@ export type EventName =
   | "qr_generated"
   | "password_generated"
   | "download_clicked"
-  | "copy_clicked";
+  | "copy_clicked"
+  | "content_generated";
 
 type SafeParams = {
   tool?: string;

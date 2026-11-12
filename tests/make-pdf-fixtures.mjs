@@ -29,4 +29,13 @@ enc.context.trailerInfo.Encrypt = enc.context.register(
   enc.context.obj({ Filter: "Standard", V: 2, R: 3, Length: 128, P: -4, O: PDFName.of("x"), U: PDFName.of("y") }),
 );
 writeFileSync(new URL("encrypted.pdf", dir), await enc.save());
+// 20 pages; page N is (300 + 5·(N−1)) pt wide so tests can identify pages in any output.
+const numbered = await PDFDocument.create();
+const f3 = await numbered.embedFont(StandardFonts.HelveticaBold);
+for (let n = 1; n <= 20; n++) {
+  const w = 300 + 5 * (n - 1);
+  const p = numbered.addPage([w, 420]);
+  p.drawText(`Page ${n}`, { x: 40, y: 200, size: 48, font: f3 });
+}
+writeFileSync(new URL("pages-20.pdf", dir), await numbered.save());
 console.log("pdfs ok");

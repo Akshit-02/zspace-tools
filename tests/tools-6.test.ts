@@ -1,0 +1,157 @@
+import { EXAMPLES, collect, compile } from "../src/lib/regex";
+import { beautify as htmlBeautify, minify as htmlMinify, validate } from "../src/lib/html-format";
+import { beautify as cssBeautify, checkCss, minifyCss, minifyKeepComments, setFinalSemicolon, tokenize } from "../src/lib/css-tools";
+import { markupDiscount, originalPrice, parseNum, pct, reverse, standard, successive } from "../src/lib/discount";
+import { formatHslA, formatRgbA, fromShareParamA, paletteCss, parseHexA, parseHslA, parseRgbA, toHexA } from "../src/lib/color";
+
+let fails = 0;
+const eq = (name: string, got: unknown, want: unknown) => {
+  const ok = JSON.stringify(got) === JSON.stringify(want);
+  if (!ok) fails++;
+  console.log(`${ok ? "PASS" : "FAIL"} ${name}${ok ? "" : `\n      got  ${JSON.stringify(got)}\n      want ${JSON.stringify(want)}`}`);
+};
+const ok = (name: string, cond: boolean, info?: unknown) => eq(name + (cond || info === undefined ? "" : ` (${JSON.stringify(info)})`), cond, true);
+const near = (a: number, b: number) => Math.abs(a - b) < 1e-9;
+
+(async () => {
+  /* ---------------- Regex ---------------- */
+  eq("regex: global matches", collect(String.raw`\d+`, "g", "10 apples, 20 pears").matches.map((m) => m.text), ["10", "20"]);
+  eq("regex: no g = first only", collect(String.raw`\d+`, "", "10 apples, 20 pears").matches.length, 1);
+  eq("regex: i flag", collect("abc", "gi", "ABC abc").matches.length, 2);
+  eq("regex: m flag anchors", collect(String.raw`^\d+$`, "gm", "123\n12a\n7").matches.map((m) => m.text), ["123", "7"]);
+  eq("regex: s flag", collect("a.b", "gs", "a\nb").matches.length, 1);
+  eq("regex: without s", collect("a.b", "g", "a\nb").matches.length, 0);
+  eq("regex: y sticky", collect("a", "y", "aab").matches.length, 2);
+  const date = collect(String.raw`(?<year>\d{4})-(?<month>\d{2})`, "g", "on 2026-11 and 2027-02").matches;
+  eq("regex: named groups", date.map((m) => m.groups.map((g) => [g.name, g.value])), [[["year", "2026"], ["month", "11"]], [["year", "2027"], ["month", "02"]]]);
+  eq("regex: group indices", [date[0].groups[0].start, date[0].groups[0].end, date[0].index, date[0].end], [3, 7, 3, 10]);
+  eq("regex: unmatched optional group", collect("a(b)?", "g", "a").matches[0].groups[0].value, undefined);
+  const zero = collect("", "g", "abc");
+  eq("regex: zero-length terminates", zero.matches.length, 4);
+  eq("regex: zero-length u flag emoji", collect("", "gu", "😀").matches.length, 2);
+  ok("regex: lookahead zero-length", collect("(?=a)", "g", "aaa").matches.length === 3);
+  eq("regex: truncation", collect(".", "g", "x".repeat(100), 10).truncated, true);
+  const bad = compile("(", "g");
+  ok("regex: invalid pattern message", !bad.ok && /Unterminated group|missing \)/i.test((bad as { message: string }).message), bad);
+  eq("regex: unknown flag", compile("a", "gx").ok, false);
+  eq("regex: duplicate flag", compile("a", "gg").ok, false);
+  eq("regex: unicode property", collect(String.raw`^\p{L}+$`, "gmu", "Café\nR2D2\nनमस्ते").matches.length, 1);
+  for (const e of EXAMPLES) ok(`regex: example ${e.id} compiles & matches`, compile(e.pattern, e.flags).ok && collect(e.pattern, e.flags, e.sample).matches.length > 0);
+  eq("regex: PIN example", collect(EXAMPLES.find((e) => e.id === "pin")!.pattern, "g", "560001, 400 013, 012345").matches.map((m) => m.text), ["560001", "400 013"]);
+  eq("regex: password example", collect(EXAMPLES.find((e) => e.id === "password")!.pattern, "gm", "weakpass\nStr0ng!Passw0rd\nNoSymbols12345").matches.map((m) => m.text), ["Str0ng!Passw0rd"]);
+
+  /* ---------------- HTML ---------------- */
+  const b = htmlBeautify("<ul><li>One<li>Two</ul>", { indent: "2", keepComments: true, keepBlankLines: false });
+  eq("html: implicit li close", b.trim(), "<ul>\n  <li>One</li>\n  <li>Two</li>\n</ul>");
+  const b4 = htmlBeautify("<div><p>Hi</p></div>", { indent: "4", keepComments: true, keepBlankLines: false });
+  eq("html: 4-space indent", b4.trim(), "<div>\n    <p>Hi</p>\n</div>");
+  ok("html: tab indent", htmlBeautify("<div><p>Hi</p></div>", { indent: "tab", keepComments: true, keepBlankLines: false }).includes("\n\t<p>"));
+  const pre = "<div><pre>  a\n    b  </pre><textarea> x  y </textarea></div>";
+  const pb = htmlBeautify(pre, { indent: "2", keepComments: true, keepBlankLines: false });
+  ok("html: pre preserved", pb.includes("<pre>  a\n    b  </pre>"), pb);
+  ok("html: textarea preserved", pb.includes("<textarea> x  y </textarea>"), pb);
+  const scr = '<script>\n  if (a < b && c > d) { x("</div>"); }\n</script>';
+  ok("html: script preserved (beautify)", htmlBeautify(scr, { indent: "2", keepComments: true, keepBlankLines: false }).includes('if (a < b && c > d) { x("</div>"); }'));
+  ok("html: script preserved (minify)", htmlMinify(scr, { keepComments: false }).includes('  if (a < b && c > d) { x("</div>"); }\n'));
+  const cm = "<div>\n  <!-- note -->\n  <p>Hi   there</p>\n</div>";
+  eq("html: minify strips comments", htmlMinify(cm, { keepComments: false }), "<div><p>Hi there</p></div>");
+  ok("html: minify keeps comments", htmlMinify(cm, { keepComments: true }).includes("<!-- note -->"));
+  ok("html: beautify drops comments", !htmlBeautify(cm, { indent: "2", keepComments: false, keepBlankLines: false }).includes("note"));
+  ok("html: void elements", !htmlBeautify("<p>a<br>b<img src=x></p>", { indent: "2", keepComments: true, keepBlankLines: false }).includes("</br>"));
+  ok("html: doctype kept", htmlBeautify("<!DOCTYPE html><html><body></body></html>", { indent: "2", keepComments: true, keepBlankLines: false }).startsWith("<!DOCTYPE html>"));
+  ok("html: attributes with > in quotes", htmlMinify('<a title="a > b" href="/x">x</a>', { keepComments: false }) === '<a title="a > b" href="/x">x</a>');
+  const issues = validate("<div><span>Hi</div>\n</section><img></img>");
+  ok("html: unclosed span flagged", issues.some((i) => /span/.test(i.message)), issues);
+  ok("html: stray close flagged", issues.some((i) => /section/.test(i.message)), issues);
+  ok("html: void close flagged", issues.some((i) => /img/.test(i.message)), issues);
+  eq("html: valid has no issues", validate("<div><p>ok</p><ul><li>a<li>b</ul></div>"), []);
+  ok("html: minified smaller", htmlMinify(b4, { keepComments: false }).length < b4.length);
+
+  /* ---------------- CSS ---------------- */
+  const src = "/*! keep */\n/* drop */\n.a  >  .b , .c:hover::after {\n  color : #FFFFFF ;\n  margin : 0px 0px ;\n  content : \"a } b\" ;\n}\n";
+  const min = await minifyCss(src, { comments: "license", keepFinalSemicolon: false });
+  eq("css: minify (license)", min.css, '/*! keep */\n.a>.b,.c:hover::after{color:#fff;margin:0 0;content:"a } b"}');
+  eq("css: no issues", min.issues, []);
+  const none = await minifyCss(src, { comments: "none", keepFinalSemicolon: false });
+  ok("css: remove all comments", !none.css.includes("/*"), none.css);
+  const all = await minifyCss(src, { comments: "all", keepFinalSemicolon: false });
+  ok("css: keep all comments", all.css.includes("/*! keep */") && all.css.includes("/* drop */"), all.css);
+  const semi = await minifyCss(src, { comments: "none", keepFinalSemicolon: true });
+  ok("css: final semicolon kept", semi.css.endsWith('content:"a } b";}'), semi.css);
+  eq("css: setFinalSemicolon remove", setFinalSemicolon("a{color:red;}b{x:\"};\";}", false), 'a{color:red}b{x:"};"}');
+  eq("css: setFinalSemicolon empty rule", setFinalSemicolon("a{}", true), "a{}");
+  eq("css: calc spaces preserved (keep-all)", minifyKeepComments("a { width : calc( 100%  -  2px ) ; }"), "a{width:calc(100% - 2px)}");
+  eq("css: media and preserved (keep-all)", minifyKeepComments("@media (min-width: 1px)  and  (max-width: 2px) { a { b: c } }"), "@media (min-width: 1px) and (max-width: 2px){a{b:c}}");
+  ok("css: descendant pseudo kept (keep-all)", minifyKeepComments(".a :hover { x: y }").startsWith(".a :hover"));
+  const pretty = cssBeautify(".a,.b{color:red;background:url(x.png)no-repeat}@media (min-width:1px){.c{d:e}}", "2");
+  eq("css: beautify", pretty, ".a,\n.b {\n  color: red;\n  background: url(x.png) no-repeat\n}\n\n@media (min-width:1px) {\n  .c {\n    d: e\n  }\n}\n");
+  ok("css: beautify 4 spaces", cssBeautify("a{b:c}", "4").includes("\n    b: c"));
+  ok("css: beautify tab", cssBeautify("a{b:c}", "tab").includes("\n\tb: c"));
+  ok("css: selector pseudo stays tight", cssBeautify("a:not(.x).y::before{b:c}", "2").startsWith("a:not(.x).y::before {"));
+  ok("css: string with braces safe", cssBeautify('a{content:"} {"}', "2").includes('content: "} {"'));
+  ok("css: beautify drop comments", !cssBeautify("/* x */a{b:c}", "2", false).includes("/* x */"));
+  ok("css: beautify keeps license when dropping", cssBeautify("/*! L */a{b:c}", "2", false).includes("/*! L */"));
+  ok("css: custom property kept", (await minifyCss(":root{--x:  { a: b } ;--y:1px}", { comments: "none", keepFinalSemicolon: false })).css.includes("--y:1px"));
+  const iss = await checkCss("a { color: red; \n b { margin: }");
+  ok("css: missing brace flagged", iss.some((i) => /missing a closing/.test(i.message)), iss);
+  ok("css: parse error with line", iss.some((i) => i.line === 2), iss);
+  ok("css: stray } flagged", (await checkCss("a{b:c}}")).some((i) => /without a matching/.test(i.message)));
+  ok("css: unclosed comment flagged", tokenize("a{b:c} /* x").unclosed !== null);
+  ok("css: unclosed string flagged", tokenize('a{content:"x}').unclosed !== null);
+
+  /* ---------------- Discount ---------------- */
+  const st = standard("2,499", "30");
+  ok("disc: 30% off 2499", st.status === "ok" && near(st.result.saving, 749.7) && near(st.result.final, 1749.3), st);
+  eq("disc: 0%", standard("100", "0").status === "ok" && (standard("100", "0") as { result: { final: number } }).result.final, 100);
+  eq("disc: 100%", (standard("100", "100") as { result: { final: number } }).result.final, 0);
+  eq("disc: >100% error", standard("100", "120").status, "error");
+  eq("disc: negative error", standard("-5", "10").status, "error");
+  eq("disc: invalid number", standard("12abc", "10").status, "error");
+  eq("disc: empty", standard("", "10").status, "empty");
+  eq("disc: parseNum Indian commas", parseNum("1,23,456.50"), 123456.5);
+  const rv = reverse("1000", "750");
+  ok("disc: reverse 25%", rv.status === "ok" && near(rv.result.percent, 25) && !rv.result.increase);
+  const inc = reverse("1000", "1200");
+  ok("disc: reverse increase", inc.status === "ok" && inc.result.increase && near(inc.result.percent, -20));
+  eq("disc: reverse zero original", reverse("0", "10").status, "error");
+  const sc = successive("10000", ["20", "10"]);
+  ok("disc: successive 20+10 → 7200, 28%", sc.status === "ok" && near(sc.result.final, 7200) && pct(sc.result.effective) === "28%" && sc.result.naiveSum === 30, sc);
+  const sc3 = successive("1000", ["10", "", "10", "10"]);
+  ok("disc: successive skips blanks", sc3.status === "ok" && sc3.result.steps.length === 3 && near(sc3.result.final, 729));
+  eq("disc: successive >100 error", successive("100", ["120"]).status, "error");
+  const op = originalPrice("750", "25");
+  ok("disc: original price", op.status === "ok" && near(op.result.original, 1000) && near(op.result.saving, 250));
+  eq("disc: original at 100% error", originalPrice("0", "100").status, "error");
+  const mk = markupDiscount("500", "40", "10");
+  ok("disc: markup", mk.status === "ok" && near(mk.result.marked, 700) && near(mk.result.selling, 630) && near(mk.result.profit, 130) && near(mk.result.profitOnCostPct, 26) && pct(mk.result.marginPct) === "20.63%", mk);
+  const loss = markupDiscount("500", "10", "20");
+  ok("disc: markup loss", loss.status === "ok" && near(loss.result.selling, 440) && near(loss.result.profit, -60));
+  const nodisc = markupDiscount("500", "20", "");
+  ok("disc: markup without discount", nodisc.status === "ok" && near(nodisc.result.selling, 600));
+  eq("disc: pct formatting", [pct(27.999999999999993), pct(20.634920634920633), pct(-0.0001)], ["28%", "20.63%", "0%"]);
+
+  /* ---------------- Colour alpha ---------------- */
+  eq("color: 8-digit hex", parseHexA("#F0784580"), { rgb: { r: 240, g: 120, b: 69 }, a: 0.5 });
+  eq("color: 4-digit hex", parseHexA("#F80C"), { rgb: { r: 255, g: 136, b: 0 }, a: 0.8 });
+  eq("color: 6-digit opaque", parseHexA("F07845")!.a, 1);
+  eq("color: 5-digit invalid", parseHexA("#12345"), null);
+  eq("color: toHexA opaque", toHexA({ r: 240, g: 120, b: 69 }, 1), "#F07845");
+  eq("color: toHexA 50%", toHexA({ r: 240, g: 120, b: 69 }, 0.5), "#F0784580");
+  eq("color: toHexA 0", toHexA({ r: 0, g: 0, b: 0 }, 0), "#00000000");
+  eq("color: rgba commas", parseRgbA("rgba(240, 120, 69, 0.5)"), { rgb: { r: 240, g: 120, b: 69 }, a: 0.5 });
+  eq("color: rgb slash percent", parseRgbA("rgb(240 120 69 / 25%)"), { rgb: { r: 240, g: 120, b: 69 }, a: 0.25 });
+  eq("color: rgb opaque", parseRgbA("rgb(255, 136, 0)")!.a, 1);
+  eq("color: rgba alpha > 1 invalid", parseRgbA("rgba(1,2,3,1.5)"), null);
+  eq("color: rgb channel > 255 invalid", parseRgbA("rgb(256,0,0)"), null);
+  eq("color: hsla", parseHslA("hsla(210, 50%, 40%, 0.3)"), { rgb: { r: 51, g: 102, b: 153 }, a: 0.3 });
+  eq("color: formatRgbA", [formatRgbA({ r: 1, g: 2, b: 3 }, 1), formatRgbA({ r: 1, g: 2, b: 3 }, 0.5)], ["rgb(1, 2, 3)", "rgba(1, 2, 3, 0.5)"]);
+  eq("color: formatHslA", formatHslA({ r: 51, g: 102, b: 153 }, 0.3), "hsla(210, 50%, 40%, 0.3)");
+  for (const a of [0, 0.01, 0.25, 0.5, 0.75, 0.99, 1]) eq(`color: hex alpha round-trip ${a}`, parseHexA(toHexA({ r: 9, g: 9, b: 9 }, a))!.a, a);
+  eq("color: share param 8-digit", fromShareParamA("f0784580")?.a, 0.5);
+  eq("color: share param rejects junk", fromShareParamA("<script>"), null);
+  const css = paletteCss({ r: 240, g: 120, b: 69 }, 1, [{ r: 240, g: 120, b: 69 }, { r: 69, g: 189, b: 240 }], Array.from({ length: 11 }, () => ({ r: 0, g: 0, b: 0 })));
+  ok("color: CSS variables", css.startsWith(":root {\n  --color-base: #F07845;\n  --color-harmony-1: #F07845;\n  --color-harmony-2: #45BDF0;") && css.includes("--color-950: #000000;") && css.trim().endsWith("}"), css);
+
+  console.log(fails ? `\n${fails} FAILED` : "\nAll tools-6 tests passed");
+  process.exit(fails ? 1 : 0);
+})();

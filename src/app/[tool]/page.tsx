@@ -94,7 +94,7 @@ export default async function ToolPage({ params }: PageProps<"/[tool]">) {
           </h2>
           <ul className="mt-10 grid gap-px overflow-hidden rounded-[14px] border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
             {tool.features.map((f) => (
-              <li key={f.title} className="bg-card p-6 sm:p-7">
+              <li key={f.title} className="min-w-0 bg-card p-6 [overflow-wrap:anywhere] sm:p-7">
                 <span aria-hidden className="block h-0.5 w-6 rounded-full bg-orange" />
                 <h3 className="mt-5 text-lg font-bold">{f.title}</h3>
                 <p className="mt-1.5 text-[0.97rem] text-ink-2">{f.body}</p>
@@ -124,6 +124,23 @@ export default async function ToolPage({ params }: PageProps<"/[tool]">) {
           </ol>
         </section>
 
+        {tool.examples && tool.examples.length > 0 && (
+          <section aria-labelledby="examples" className="mt-24">
+            <Eyebrow>Examples</Eyebrow>
+            <h2 id="examples" className="mt-4 font-display text-h2 font-semibold">
+              Worked examples
+            </h2>
+            <ul className="mt-10 grid gap-4 md:grid-cols-3">
+              {tool.examples.map((ex) => (
+                <li key={ex.title} className="min-w-0 rounded-[14px] border border-line bg-card p-6 [overflow-wrap:anywhere]">
+                  <h3 className="font-display text-xl font-semibold tracking-[-0.01em]">{ex.title}</h3>
+                  <p className="mt-2 text-[0.97rem] leading-relaxed text-ink-2">{ex.body}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <div className="mt-24 grid gap-6 lg:grid-cols-2">
           <section aria-labelledby="specs" className="rounded-[14px] border border-line bg-card p-6 sm:p-8">
             <h2 id="specs" className="font-display text-2xl font-semibold">
@@ -133,7 +150,7 @@ export default async function ToolPage({ params }: PageProps<"/[tool]">) {
               {tool.specs.map((s) => (
                 <div key={s.label} className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-4 py-3">
                   <dt className="text-sm text-ink-2">{s.label}</dt>
-                  <dd className="font-mono text-[0.82rem] text-charcoal">{s.value}</dd>
+                  <dd className="font-mono text-[0.82rem] text-charcoal [overflow-wrap:anywhere]">{s.value}</dd>
                 </div>
               ))}
             </dl>

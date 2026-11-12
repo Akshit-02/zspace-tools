@@ -50,7 +50,7 @@ export function Accordion({ items, defaultOpen = 0 }: { items: { q: string; a: s
               )}
             >
               <div className="overflow-hidden" inert={!isOpen}>
-                <p className="max-w-3xl pb-6 pr-4 text-ink-2 sm:pr-12">{item.a}</p>
+                <p className="max-w-3xl pb-6 pr-4 text-ink-2 [overflow-wrap:anywhere] sm:pr-12">{item.a}</p>
               </div>
             </div>
           </div>

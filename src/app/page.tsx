@@ -11,15 +11,15 @@ import { ToolIcon } from "@/components/ToolIcon";
 import { Accordion } from "@/components/Accordion";
 import { Reveal, Stagger, StaggerItem } from "@/components/Reveal";
 import { JsonLd } from "@/components/JsonLd";
-import { categories, plannedTools, tools, toolsInCategory } from "@/lib/tools";
-import { homeFaqs } from "@/lib/home";
+import { categories, getTool, plannedTools, toolPath, tools, toolsInCategory, type Tool } from "@/lib/tools";
+import { homeFaqs, popularSlugs } from "@/lib/home";
 import { faqLd, graph, pageMetadata, webPageLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "ZSpace Tools — Free Online Tools: Compress Images & PDFs, QR Codes, Passwords",
+  title: "ZSpace Tools — Free Online Tools for Images, PDFs, Text & Calculations",
   description:
-    "Free, simple online tools: compress images and PDFs, create QR codes, count words and generate strong passwords. Runs in your browser, no sign-up.",
+    "Free, simple online tools: compress and crop images, merge PDFs, create invoices, format JSON, calculate EMI and GST, and more. Runs in your browser.",
   path: "/",
   absoluteTitle: true,
 });
@@ -44,7 +44,7 @@ const steps = [
 ];
 
 export default function HomePage() {
-  const [feature, second, ...rest] = tools;
+  const [feature, second, ...rest] = popularSlugs.map(getTool).filter((t): t is Tool => Boolean(t));
   return (
     <>
       <JsonLd
@@ -105,7 +105,7 @@ export default function HomePage() {
               <h2 className="mt-4 font-display text-h2 font-semibold">Popular tools</h2>
             </div>
             <p className="max-w-sm text-ink-2">
-              Five tools, each built properly — with real results, honest numbers and nothing uploaded.
+              The tools people reach for most — each built properly, with real results, honest numbers and nothing uploaded.
             </p>
           </div>
           <Stagger className="mt-12 grid gap-4 md:grid-cols-6 lg:grid-cols-12">
@@ -174,7 +174,7 @@ export default function HomePage() {
                 </>
               );
               return (
-                <li key={cat.id} className="bg-card">
+                <li key={cat.id} className="bg-card sm:[&:last-child:nth-child(odd)]:col-span-2">
                   {live ? (
                     <Link href={`/all-tools/#${cat.id}`} className="group relative block h-full p-6 transition-colors hover:bg-ivory">
                       {inner}
@@ -188,6 +188,44 @@ export default function HomePage() {
               );
             })}
           </ul>
+        </Container>
+      </section>
+
+      {/* ───────────── All tools index ───────────── */}
+      <section aria-labelledby="all-tools-h" className="py-20 sm:py-24">
+        <Container>
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <Eyebrow>Everything</Eyebrow>
+              <h2 id="all-tools-h" className="mt-4 font-display text-h2 font-semibold">
+                All {tools.length} tools
+              </h2>
+            </div>
+            <Link href="/all-tools/" className="group inline-flex items-center gap-1.5 text-sm font-medium">
+              Open the directory <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+          <div className="mt-10 grid gap-x-8 gap-y-10 border-t border-line pt-8 sm:grid-cols-2 lg:grid-cols-4">
+            {categories
+              .filter((c) => toolsInCategory(c.id).length > 0)
+              .map((c) => (
+                <div key={c.id} className="min-w-0">
+                  <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-ink-2">
+                    <ToolIcon name={c.icon} className="size-3.5" /> {c.name}
+                  </h3>
+                  <ul className="mt-3 border-t border-line">
+                    {toolsInCategory(c.id).map((t) => (
+                      <li key={t.slug} className="min-w-0 border-b border-line">
+                        <Link href={toolPath(t.slug)} className="group flex items-center gap-3 py-3">
+                          <span className="min-w-0 flex-1 truncate font-medium text-charcoal transition-colors group-hover:text-orange-ink">{t.name}</span>
+                          <ArrowUpRight aria-hidden className="size-4 shrink-0 text-ink-3 transition-all group-hover:rotate-45 group-hover:text-charcoal" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+          </div>
         </Container>
       </section>
 

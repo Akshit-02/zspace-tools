@@ -9,9 +9,9 @@ export const site = {
   tagline: "Everyday tools. Made effortlessly simple.",
   heroTagline: "Less effort. More done.",
   description:
-    "ZSpace Tools is a free collection of simple online tools — compress images and PDFs, generate QR codes and strong passwords, and count words. Files are processed in your browser, with no sign-up.",
+    "ZSpace Tools is a free collection of simple online tools — compress and crop images, merge PDFs, create invoices, format JSON, pick colours and calculate loan EMI, GST and dates. Everything runs in your browser, with no sign-up.",
   shortDescription:
-    "Simple, free online tools for everyday tasks — processed in your browser, no sign-up.",
+    "Free, simple online tools for images, PDFs, text, data and everyday calculations — processed in your browser, no sign-up.",
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "connect@zspace.in",
   locale: "en",
   // Set when content was first published; used as a stable date in metadata.
@@ -27,6 +27,10 @@ export const limits = {
   imageMaxMB: mb(process.env.NEXT_PUBLIC_MAX_IMAGE_MB, 25),
   maxImages: mb(process.env.NEXT_PUBLIC_MAX_IMAGES, 30),
   pdfMaxMB: mb(process.env.NEXT_PUBLIC_MAX_PDF_MB, 100),
+  /** Files per batch for PDF Merger. */
+  maxPdfFiles: mb(process.env.NEXT_PUBLIC_MAX_PDF_FILES, 30),
+  /** Combined input size for PDF Merger, in MB. */
+  mergeMaxMB: mb(process.env.NEXT_PUBLIC_MAX_MERGE_MB, 250),
 } as const;
 
 export const analyticsConfig = {

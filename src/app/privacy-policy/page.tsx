@@ -23,14 +23,34 @@ export default function PrivacyPage() {
       <p>All tools currently on {site.name} run entirely in your web browser:</p>
       <ul>
         <li>
-          <strong>Image Compressor and PDF Compressor</strong> read and compress your files locally using your browser&rsquo;s built-in capabilities. Files are not
-          uploaded to our servers or to any third party.
+          <strong>Image Compressor, Image Resizer, Image Cropper and Image to PDF Converter</strong> read, crop, resize, compress and convert your images locally using your
+          browser&rsquo;s built-in capabilities. Images are not uploaded to our servers or to any third party.
+        </li>
+        <li>
+          <strong>PDF Compressor, PDF Merger and PDF Splitter</strong> open and process your PDFs locally. Documents — and the page previews generated from
+          them — are never uploaded.
         </li>
         <li>
           <strong>QR Code Generator</strong> creates codes in your browser. The links, text, contact details and Wi-Fi credentials you enter are not transmitted.
         </li>
         <li>
-          <strong>Word Counter</strong> analyses your text in your browser. Your text is not transmitted or saved.
+          <strong>Word Counter, Case Converter, Markdown Editor, JSON Formatter, URL Encoder, Base64 Encoder, CSV to JSON Converter, UUID Generator, URL Slug Generator, Regex Tester, HTML Formatter, CSS Minifier and Color Picker</strong> work on your text, files and data
+          in your browser. Pasted text, URLs, JSON, CSV, HTML and CSS, regex patterns and test text — including any keys or personal data inside them — are not transmitted or saved.
+        </li>
+        <li>
+          <strong>Meta Tag Generator, XML Sitemap Generator, Robots.txt Generator, Open Graph Preview and HTML Entity Encoder</strong> build their output in your
+          browser. They don&apos;t crawl or fetch websites and don&apos;t submit anything to search engines. When you enter an image URL in the Meta Tag Generator or
+          Open Graph Preview, your browser loads that image directly from its own server to show the preview — that server sees an ordinary image request from
+          your browser, as it would on any website. Local images you pick for a preview stay on your device.
+        </li>
+        <li>
+          <strong>EMI, GST, Discount, Percentage, Age and Days Between Dates calculators and the Unit Converter</strong> calculate in your browser. Loan details, amounts,
+          measurements and dates — including your date of birth — are not transmitted, stored or included in analytics.
+        </li>
+        <li>
+          <strong>Invoice Generator</strong> builds invoices and PDFs in your browser. Business, customer and payment details are never uploaded. If you turn on
+          &ldquo;Keep draft in this browser&rdquo; (Invoice Generator or Markdown Editor), your draft is stored in your browser&rsquo;s local storage on that
+          device only; switching it off deletes it.
         </li>
         <li>
           <strong>Password Generator</strong> uses your browser&rsquo;s cryptographic random number generator. Passwords are not transmitted, stored or logged.
@@ -75,6 +95,7 @@ export default function PrivacyPage() {
         {analyticsOn
           ? "Apart from the analytics cookies described above, we do not set cookies."
           : "We do not set cookies."}{" "}
+        Local storage is used only for drafts you explicitly choose to keep.{" "}
         We do not use advertising, cross-site tracking or fingerprinting.
       </p>
 

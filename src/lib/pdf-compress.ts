@@ -11,12 +11,12 @@
  * The caller compares the final size with the original before offering it.
  */
 
+import { PdfError, loadPdf, tick } from "./pdf-utils";
 import {
   PDFArray,
   PDFBool,
   PDFDict,
   PDFDocument,
-  EncryptedPDFError,
   PDFName,
   PDFNumber,
   PDFRawStream,
@@ -43,15 +43,6 @@ export interface PdfResult {
   pages: number;
   imagesFound: number;
   imagesOptimised: number;
-}
-
-export class PdfError extends Error {
-  constructor(
-    public code: "not-pdf" | "encrypted" | "damaged" | "memory",
-    message: string,
-  ) {
-    super(message);
-  }
 }
 
 const N = (s: string) => PDFName.of(s);
@@ -204,26 +195,14 @@ async function encodeJpeg(src: ImageBitmap, maxDim: number, quality: number) {
   return { bytes: new Uint8Array(await blob.arrayBuffer()), w, h };
 }
 
-const tick = () => new Promise((r) => setTimeout(r, 0));
 
 export async function compressPdf(
   input: ArrayBuffer,
   level: PdfLevel,
   onProgress?: (p: PdfProgress) => void,
 ): Promise<PdfResult> {
-  const head = new TextDecoder("latin1").decode(new Uint8Array(input.slice(0, 1024)));
-  if (!head.includes("%PDF-")) throw new PdfError("not-pdf", "This file isn't a PDF. Choose a file that ends in .pdf.");
-
   onProgress?.({ phase: "reading", done: 0, total: 1 });
-  let doc: PDFDocument;
-  try {
-    doc = await PDFDocument.load(input, { updateMetadata: false, throwOnInvalidObject: false });
-  } catch (e) {
-    if (e instanceof EncryptedPDFError || (e instanceof Error && /encrypt/i.test(e.message))) {
-      throw new PdfError("encrypted", "This PDF is password-protected or encrypted. Remove the protection in the app you used to create it, then try again.");
-    }
-    throw new PdfError("damaged", "This PDF couldn't be opened. It may be damaged or use a structure the browser can't read.");
-  }
+  const doc = await loadPdf(input);
 
   const { maxDim, quality } = LEVELS[level];
   const ctx = doc.context;
@@ -316,3 +295,5 @@ export async function compressPdf(
   const bytes = await doc.save({ useObjectStreams: true, addDefaultPage: false, updateFieldAppearances: false });
   return { bytes, pages: doc.getPageCount(), imagesFound: imageRefs.length, imagesOptimised: optimised };
 }
+
+export { PdfError };

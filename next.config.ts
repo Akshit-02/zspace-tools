@@ -9,7 +9,8 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com",
+  // https: lets users preview their own Markdown images; images cannot execute code.
+  "img-src 'self' data: blob: https:",
   "font-src 'self'",
   "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "worker-src 'self' blob:",
@@ -56,6 +57,9 @@ const nextConfig: NextConfig = {
       // /tools/ and /categories/ are aliases of the single canonical directory page.
       { source: "/tools", destination: "/all-tools/", permanent: true },
       { source: "/categories", destination: "/all-tools/#categories", permanent: true },
+      // Renamed tools keep their old URLs working.
+      { source: "/loan-emi-calculator", destination: "/emi-calculator/", permanent: true },
+      { source: "/date-calculator", destination: "/days-between-dates/", permanent: true },
     ];
   },
 };
