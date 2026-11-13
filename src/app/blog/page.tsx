@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/Link";
 import { ArrowUpRight } from "lucide-react";
 import { Container, Eyebrow } from "@/components/Container";
 import { Breadcrumbs } from "@/components/Breadcrumbs";

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/Link";
 import { ArrowUpRight } from "lucide-react";
 import { clsx } from "clsx";
 import { ToolIcon } from "./ToolIcon";

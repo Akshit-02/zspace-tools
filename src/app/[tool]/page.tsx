@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/ui/Link";
 import { ShieldCheck } from "lucide-react";
 import { Container, Eyebrow } from "@/components/Container";
 import { Breadcrumbs } from "@/components/Breadcrumbs";

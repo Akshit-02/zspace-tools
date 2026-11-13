@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/Link";
 import { ProsePage } from "@/components/ProsePage";
 import { pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";

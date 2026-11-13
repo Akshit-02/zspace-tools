@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/Link";
 import { ZMark } from "./Logo";
 import { site, legalNav } from "@/lib/site";
 import { categories, getTool, tools, toolPath, toolsInCategory, type Tool } from "@/lib/tools";

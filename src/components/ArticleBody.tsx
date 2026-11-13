@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/Link";
 import { ArrowRight, Lightbulb } from "lucide-react";
 import { ToolIcon } from "./ToolIcon";
 import { getTool, toolPath } from "@/lib/tools";

@@ -41,7 +41,20 @@ const nextConfig: NextConfig = {
     },
   },
   async headers() {
+    // Heavy runtime assets (WASM codecs, OCR models, pdf.js, PDF fonts) are tens
+    // of MB and only change when a dependency is upgraded. Vercel's default for
+    // /public files is `max-age=0, must-revalidate`, so browsers re-request them on
+    // every visit. Cache them in the browser for a week and at the CDN for a year
+    // (the CDN cache is purged on every deploy, so upgrades still roll out).
+    const assetCache = {
+      key: "Cache-Control",
+      value: "public, max-age=604800, s-maxage=31536000, stale-while-revalidate=86400",
+    };
     return [
+      ...["/wasm/:path*", "/ocr/:path*", "/pdfjs/:path*", "/fonts/:path*"].map((source) => ({
+        source,
+        headers: [assetCache],
+      })),
       {
         source: "/:path*",
         headers: [
