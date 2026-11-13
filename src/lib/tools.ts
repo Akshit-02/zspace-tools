@@ -55,7 +55,22 @@ export type IconName =
   | "robots"
   | "share"
   | "entity"
-  | "globe";
+  | "globe"
+  | "pdf-word"
+  | "word-pdf"
+  | "pdf-image"
+  | "convert-image"
+  | "ocr"
+  | "pdf-table"
+  | "sheet-pdf"
+  | "pdf-edit"
+  | "pdf-grid"
+  | "signature"
+  | "lock"
+  | "unlock"
+  | "stamp"
+  | "numbers"
+  | "slides";
 
 export interface Category {
   id: CategoryId;
@@ -73,6 +88,8 @@ export interface Tool {
   slug: string;
   name: string;
   category: CategoryId;
+  /** Extra categories the tool is also listed under (one page, several directory entries). */
+  alsoIn?: CategoryId[];
   icon: IconName;
   /** One-line card description. */
   short: string;
@@ -115,7 +132,7 @@ export const categories: Category[] = [
   { id: "productivity", name: "Productivity Tools", description: "Small utilities that save everyday minutes.", icon: "zap" },
   { id: "qr", name: "QR Tools", description: "Create QR codes for links, Wi-Fi and contact details.", icon: "qr" },
   { id: "developer", name: "Developer Tools", description: "Format, encode, generate and convert data for your projects.", icon: "code" },
-  { id: "conversion", name: "Conversion Tools", description: "Convert units and formats in a click.", icon: "repeat" },
+  { id: "conversion", name: "File & Unit Conversion", description: "Convert PDFs, Word documents and images between formats — and units of measurement.", icon: "repeat" },
 ];
 
 const MAX_IMG = `${limits.imageMaxMB} MB`;
@@ -586,6 +603,7 @@ export const tools: Tool[] = [
     slug: "image-to-pdf",
     name: "Image to PDF Converter",
     category: "pdf",
+    alsoIn: ["conversion"],
     icon: "image-pdf",
     short: "Turn JPG, PNG and WebP images into one PDF, with page size, margins and order.",
     intro:
@@ -2212,12 +2230,918 @@ export const tools: Tool[] = [
     published: "2026-11-12",
     updated: "2026-11-12",
   },
+  {
+    slug: "pdf-to-word",
+    name: "PDF to Word Converter",
+    category: "pdf",
+    alsoIn: ["conversion"],
+    icon: "pdf-word",
+    short: "Turn a PDF into an editable Word (DOCX) file — with OCR for scanned pages.",
+    intro:
+      "Convert a PDF into a Word document you can edit. Text, headings, paragraphs, simple tables and images are rebuilt as real Word content, and scanned pages can be read with OCR — all on your own device.",
+    what:
+      "A PDF to Word converter turns a PDF into an editable .docx file that opens in Microsoft Word, Google Docs, LibreOffice or Pages. ZSpace Tools' PDF to Word Converter reads the text, fonts and images in your PDF and rebuilds them as Word paragraphs, headings, tables and pictures — it doesn't just paste plain text into a document.",
+    how:
+      "PDFs store each piece of text at an exact position rather than as paragraphs, so the converter reconstructs the structure. It groups text into lines by position, joins lines into paragraphs using spacing and indentation, spots headings from larger or bold type, works out alignment (left, centred, right or justified), finds simple tables where several rows line up in columns, reads two-column pages in the right order, and places images where they appeared. Each PDF page becomes a Word section with the same page size and margins. Pages that are only pictures of text (scans) are detected; you can recognise their text with OCR, or keep them as images so nothing goes missing. Everything runs in your browser using pdf.js, Tesseract and the docx library.",
+    seo: {
+      title: "PDF to Word Converter – Convert PDF to Editable DOCX Online",
+      description:
+        "Convert PDF to editable Word (DOCX) online for free. Keeps paragraphs, headings, simple tables and images, with OCR for scanned PDFs. Your file never leaves your device.",
+      keyword: "PDF to Word Converter",
+      secondary: ["convert PDF to Word", "PDF to DOCX", "free PDF to Word converter", "online PDF to Word", "PDF document to editable Word", "convert PDF file to DOCX"],
+    },
+    features: [
+      { title: "Real, editable Word files", body: "Paragraphs, headings, bold and italic text, alignment and indents become proper Word formatting — not a picture or a single block of text." },
+      { title: "Tables and images", body: "Rows of text that line up in columns become Word tables; embedded images are placed where they appeared." },
+      { title: "Same page size", body: "Each PDF page becomes a Word page with the same size, orientation and margins." },
+      { title: "Scanned PDFs", body: "Scanned pages are detected. Turn on OCR to make their text editable in English, Hindi, Gujarati, Spanish, French or German." },
+      { title: "Two-column pages", body: "Newsletter-style columns are read top to bottom, column by column, so sentences stay in order." },
+      { title: "Private by design", body: "The PDF is read and converted in your browser. It's never uploaded." },
+    ],
+    steps: [
+      { title: "Add your PDF", body: "Drop it in or choose it. You'll see the first page, the page count and whether any pages look scanned." },
+      { title: "Convert", body: "Turn on OCR if the PDF is scanned, then press Convert to Word. Progress is shown page by page." },
+      { title: "Download and review", body: "Download the .docx and check it in Word — complex layouts may need small touch-ups." },
+    ],
+    specs: [
+      { label: "Output", value: "DOCX (Word 2007 and later, Google Docs, LibreOffice, Pages)" },
+      { label: "Kept", value: "Paragraphs, headings, bold/italic, sizes, alignment, indents, simple tables, images, page size" },
+      { label: "Not kept", value: "Text colours, exact fonts not on your computer, complex or merged tables, form fields" },
+      { label: "Scanned pages", value: "OCR (6 languages) or kept as images" },
+      { label: "Limits", value: "60 MB, 300 pages" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF", "DOCX"],
+    privacy: "Your PDF is converted in your browser and never uploaded. OCR language data is downloaded from this site the first time you use it, then cached by your browser.",
+    examples: [
+      { title: "A report", body: "A 12-page report with headings, numbered sections and two tables becomes a Word file with Heading styles for the titles, normal paragraphs for the text and two Word tables." },
+      { title: "A scanned letter", body: "A 2-page scanned letter has no text layer. With OCR on (English), the letter's text comes back as editable paragraphs; with OCR off, each page is kept as an image." },
+      { title: "A brochure", body: "A two-column brochure page is read column by column, with its photos placed between the paragraphs where they appeared." },
+    ],
+    faqs: [
+      { q: "Will my Word file look exactly like the PDF?", a: "Usually close, but not always identical. A PDF records where each letter goes, not paragraphs or tables, so the layout has to be rebuilt. Simple documents convert well; complex layouts, merged table cells, text boxes and colours may need adjusting in Word." },
+      { q: "Can it convert scanned PDFs?", a: "Yes, with OCR turned on. Scanned pages are pictures of text, so the text is recognised first. OCR isn't perfect — check names, numbers and dates. Without OCR, scanned pages are kept as images so nothing is lost." },
+      { q: "Is my PDF uploaded to a server?", a: "No. The conversion runs entirely in your browser, so the file never leaves your device." },
+      { q: "Can I convert a password-protected PDF?", a: "Not directly. Open it with the password in a PDF reader, save or print an unlocked copy, and convert that." },
+      { q: "Why are some fonts different?", a: "Fonts embedded in a PDF usually can't be reused in Word. The converter picks the matching common font (for example Arial or Times New Roman) or the original font's name, and Word substitutes if you don't have it." },
+      { q: "Is there a size limit?", a: "Up to 60 MB and 300 pages, because everything is processed in your browser's memory. For bigger files, split the PDF first with the PDF Splitter." },
+    ],
+    related: ["word-to-pdf", "pdf-compressor", "pdf-merger", "pdf-splitter"],
+    searchTerms: ["pdf to word", "pdf to docx", "pdf to doc", "convert pdf", "editable pdf", "pdf converter", "word", "docx", "ocr pdf", "scanned pdf", "pdf to editable"],
+    published: "2026-11-12",
+    updated: "2026-11-12",
+  },
+  {
+    slug: "word-to-pdf",
+    name: "Word to PDF Converter",
+    category: "pdf",
+    alsoIn: ["conversion"],
+    icon: "word-pdf",
+    short: "Turn Word (DOCX) documents into PDF with the same page size and margins.",
+    intro:
+      "Convert Word documents to PDF right in your browser. See a preview of every page first, then save a PDF with the document's own page size, orientation and margins — one file at a time or several combined.",
+    what:
+      "A Word to PDF converter turns a .docx file into a PDF that looks the same on every device and can't be accidentally edited. ZSpace Tools' Word to PDF Converter renders your document — text, headings, tables, images, headers and footers — in the browser and uses the browser's own PDF engine to save it, so the text in the PDF stays selectable and searchable.",
+    how:
+      "The .docx file (a zip of XML files) is read with docx-preview, which lays out each section with the page size, margins and orientation stored in the document, along with its styles, tables, images, headers and footers. Any links that aren't web or email links are removed, and embedded HTML or scripts are never displayed. When you save, the pages are sent to your browser's print engine with matching page sizes, and you choose Save as PDF. Documents saved by Word include page-break positions, so each page matches Word's; for other documents the browser decides the page breaks.",
+    seo: {
+      title: "Word to PDF Converter – Convert DOC and DOCX to PDF Online",
+      description:
+        "Convert Word DOCX documents to PDF online for free. Keeps page size, margins, tables, images, headers and footers. Preview first — your file never leaves your device.",
+      keyword: "Word to PDF Converter",
+      secondary: ["Word to PDF", "DOCX to PDF", "DOC to PDF", "convert Word document to PDF", "online Word to PDF converter", "free DOCX to PDF converter"],
+    },
+    features: [
+      { title: "Preview before saving", body: "See every page of the document as it will be saved." },
+      { title: "Your page settings", body: "Page size (A4, Letter and others), orientation and margins come from the document itself." },
+      { title: "Tables, images, headers", body: "Tables, pictures, headers, footers, footnotes and page breaks are included." },
+      { title: "Selectable text", body: "The PDF is made by your browser's PDF engine, so text stays sharp, searchable and copyable." },
+      { title: "Several documents", body: "Add up to 10 documents, save each one, or combine them into a single PDF." },
+      { title: "Private", body: "Documents are rendered on your device. Nothing is uploaded." },
+    ],
+    steps: [
+      { title: "Add Word documents", body: "Drop in one or more .docx files and check the preview." },
+      { title: "Save as PDF", body: "Press Save as PDF. Your browser's print window opens with the right page size." },
+      { title: "Choose Save as PDF", body: "Pick Save as PDF (or Microsoft Print to PDF) as the destination and save." },
+    ],
+    specs: [
+      { label: "Input", value: "DOCX (Word 2007 and later). Legacy .doc: re-save as .docx" },
+      { label: "Kept", value: "Page size, orientation, margins, styles, tables, images, headers/footers, footnotes, page breaks" },
+      { label: "PDF engine", value: "Your browser's (Chrome, Edge, Firefox, Safari)" },
+      { label: "Batch", value: "Up to 10 files; save separately or as one PDF" },
+      { label: "File size", value: "Up to 30 MB each" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["DOCX", "PDF"],
+    privacy: "Documents are rendered and printed to PDF in your browser. They're never uploaded or stored.",
+    examples: [
+      { title: "A CV", body: "A 2-page A4 CV saved from Word keeps its margins, fonts (where installed) and page break, producing a 2-page A4 PDF with selectable text." },
+      { title: "A landscape table", body: "A Letter-size landscape report with a wide table is saved as landscape Letter pages, matching the document's settings." },
+      { title: "Combining files", body: "A cover letter and a CV added together can be saved as one PDF, each keeping its own page size." },
+    ],
+    faqs: [
+      { q: "Will the PDF look exactly like my Word document?", a: "For most documents it's very close, but it isn't Microsoft Word, so complex layouts can differ — text boxes, SmartArt, some charts, EMF/WMF drawings and fonts you don't have installed. Always check the preview before saving." },
+      { q: "Can I convert .doc files?", a: "Not in the browser. The old .doc format is a different binary format. Open it in Word, Google Docs or LibreOffice, save it as .docx, then convert." },
+      { q: "Why does a print window open?", a: "Your browser's print engine is what creates the PDF — it keeps text selectable and handles fonts properly. Choose Save as PDF as the destination." },
+      { q: "Are my documents uploaded?", a: "No. Everything happens in your browser, so your document never leaves your device." },
+      { q: "Can I change the page size or margins?", a: "The PDF uses the size, orientation and margins saved in the document. To change them, adjust the Page Setup in Word and convert again." },
+      { q: "Why do headers appear only on the first page?", a: "If a document wasn't saved by Word, it has no stored page layout, so your browser decides the page breaks and can't repeat headers and footers. Re-saving the document in Word usually fixes this." },
+    ],
+    related: ["pdf-to-word", "pdf-compressor", "pdf-merger"],
+    searchTerms: ["word to pdf", "docx to pdf", "doc to pdf", "convert word", "word converter", "save as pdf", "document to pdf", "pdf", "docx", "microsoft word"],
+    published: "2026-11-12",
+    updated: "2026-11-12",
+  },
+  {
+    slug: "pdf-to-jpg",
+    name: "PDF to JPG & PNG Converter",
+    category: "pdf",
+    alsoIn: ["conversion", "image"],
+    icon: "pdf-image",
+    short: "Turn PDF pages into JPG or PNG images at 72, 150 or 300 DPI.",
+    intro:
+      "Convert PDF pages into high-quality JPG or PNG images. Choose the pages, resolution and quality, preview the results, and download single images or everything as a ZIP.",
+    what:
+      "A PDF to JPG converter turns each page of a PDF into a picture you can post, share or insert anywhere images are accepted. ZSpace Tools' PDF to JPG & PNG Converter renders pages with pdf.js — the same engine Firefox uses to show PDFs — at the resolution you choose, entirely in your browser.",
+    how:
+      "Each selected page is drawn onto a canvas sized for your DPI (pixels = page size in inches × DPI) and encoded as JPG (with your quality setting) or PNG. Pages are rendered one at a time and each canvas is released straight away, so even long documents don't run out of memory. JPG can't be transparent, so a background colour is always filled; PNG can keep transparent areas where the page has no background. Very large pages are capped to stay inside your browser's canvas limits, and the actual DPI is shown.",
+    seo: {
+      title: "PDF to JPG & PNG Converter – Convert PDF Pages to Images",
+      description:
+        "Convert PDF pages to JPG or PNG images online for free. Choose pages, 72–300 DPI and quality, then download images or a ZIP. Converted in your browser — nothing is uploaded.",
+      keyword: "PDF to JPG Converter",
+      secondary: ["PDF to PNG", "convert PDF to JPG", "PDF pages to images", "convert PDF into pictures", "PDF image converter", "PDF to JPEG online"],
+    },
+    features: [
+      { title: "JPG or PNG", body: "JPG for small files, PNG for lossless quality and optional transparency." },
+      { title: "72, 150 or 300 DPI", body: "Screen, balanced or print resolution, with the exact pixel size shown before converting." },
+      { title: "Pick your pages", body: "Click thumbnails or type a range like 1-3, 7 — convert all pages or just a few." },
+      { title: "Quality and background", body: "JPG quality slider and a background colour for transparent or blank areas." },
+      { title: "ZIP download", body: "Download images one by one, or all of them in a single ZIP." },
+      { title: "Built for big PDFs", body: "Page-by-page rendering with progress, a Cancel button and large-job warnings." },
+    ],
+    steps: [
+      { title: "Add a PDF", body: "Drop it in. Page thumbnails appear as you scroll." },
+      { title: "Choose pages and settings", body: "Select pages, then JPG or PNG, the DPI and the quality." },
+      { title: "Convert and download", body: "Download single images or everything as a ZIP." },
+    ],
+    specs: [
+      { label: "Output", value: "JPG or PNG" },
+      { label: "Resolution", value: "72, 150 or 300 DPI (A4 at 300 DPI = 2480 × 3508 px)" },
+      { label: "JPG quality", value: "40–100%" },
+      { label: "Max image", value: "16 megapixels per page (browser canvas limit)" },
+      { label: "PDF size", value: "Up to 100 MB" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF", "JPG", "PNG", "ZIP"],
+    privacy: "Your PDF is rendered to images in your browser. Nothing is uploaded or stored.",
+    examples: [
+      { title: "An A4 page", body: "At 72 DPI an A4 page becomes 595 × 842 px; at 150 DPI 1240 × 1754 px; at 300 DPI 2480 × 3508 px." },
+      { title: "Slides for social media", body: "A 20-page slide deck at 150 DPI, JPG quality 85%, gives 20 sharp images — about 200–400 KB each, in one ZIP." },
+      { title: "A single page", body: "Type 3 in the range box to convert only page 3, for example to post a chart." },
+    ],
+    faqs: [
+      { q: "Which DPI should I choose?", a: "72 DPI for quick screen previews, 150 DPI for sharing and most uses, and 300 DPI for printing or zooming in. Higher DPI means bigger files." },
+      { q: "JPG or PNG?", a: "JPG gives much smaller files and suits photos and scans. PNG is lossless — better for text, diagrams and anything you'll edit — and can keep transparency." },
+      { q: "Is my PDF uploaded?", a: "No. Pages are rendered in your browser and never leave your device." },
+      { q: "Can it convert password-protected PDFs?", a: "No — please upload an unlocked copy. Open the PDF with its password in a PDF reader and save it without protection first." },
+      { q: "Why is my 300 DPI image smaller than expected?", a: "Very large pages would exceed what a browser can draw at once, so they're scaled to fit about 16 megapixels. The actual DPI is shown next to each image." },
+      { q: "Will the images look exactly like the PDF?", a: "They're rendered with pdf.js, which is very accurate. Rare features — some blend modes or unusual fonts — can look slightly different from other PDF viewers." },
+    ],
+    related: ["image-to-pdf", "pdf-splitter", "image-converter"],
+    searchTerms: ["pdf to jpg", "pdf to png", "pdf to image", "pdf to jpeg", "pdf pages to images", "convert pdf", "pdf picture", "pages as images", "dpi"],
+    published: "2026-11-12",
+    updated: "2026-11-12",
+  },
+  {
+    slug: "image-converter",
+    name: "Image Converter",
+    category: "image",
+    alsoIn: ["conversion"],
+    icon: "convert-image",
+    short: "Convert JPG, PNG, WebP, HEIC, AVIF, BMP and GIF to JPG, PNG, WebP or AVIF.",
+    intro:
+      "Convert images between formats in seconds — including iPhone HEIC photos and modern AVIF. Convert one image or a whole batch, resize if you like, and download everything as a ZIP.",
+    what:
+      "An image converter changes a picture from one file format to another — for example HEIC to JPG so an iPhone photo opens everywhere, or PNG to WebP for a faster website. ZSpace Tools' Image Converter reads JPG, PNG, WebP, HEIC/HEIF, AVIF, BMP and GIF, and saves JPG, PNG, WebP or AVIF, entirely on your device.",
+    how:
+      "Each file's format is identified from its contents, not its name. JPG, PNG, WebP, BMP, GIF and (in most browsers) AVIF are decoded by your browser; HEIC/HEIF photos are decoded with libheif, and AVIF with libavif if your browser can't, both compiled to WebAssembly and run in a background worker. The image is drawn onto a canvas — resized if you asked — and saved in the new format. JPG can't store transparency, so transparent areas are filled with the background colour you choose (white by default). If your browser can't create AVIF files itself, libavif encodes them on your device instead.",
+    seo: {
+      title: "Image Converter – Convert JPG, PNG, WebP, HEIC & AVIF Online",
+      description:
+        "Convert images to JPG, PNG, WebP or AVIF online for free — including iPhone HEIC photos. Batch convert, resize and download as ZIP. Images never leave your device.",
+      keyword: "Image Converter",
+      secondary: ["JPG to PNG", "PNG to JPG", "WebP to JPG", "JPG to WebP", "HEIC to JPG", "AVIF to JPG", "convert image format online", "image format conversion"],
+    },
+    features: [
+      { title: "HEIC and AVIF", body: "Open iPhone HEIC photos and AVIF images even where your browser can't, and create AVIF files." },
+      { title: "Batch conversion", body: "Convert up to 30 images at once and download them individually or as a ZIP." },
+      { title: "Transparency handled", body: "PNG, WebP and AVIF keep transparency; for JPG you choose the background colour instead of losing it silently." },
+      { title: "Quality and size", body: "Quality slider for JPG, WebP and AVIF, plus optional resizing with the aspect ratio kept." },
+      { title: "Rename on the way", body: "Name outputs with a pattern such as {name}-web or photo-{n}." },
+      { title: "Private", body: "Images are converted on your device. Nothing is uploaded." },
+    ],
+    steps: [
+      { title: "Choose the output format", body: "JPG, PNG, WebP or AVIF, and set quality or size if needed." },
+      { title: "Add your images", body: "Drop in one or many. Each is converted straight away with its own status." },
+      { title: "Download", body: "Download each image, or all of them as a ZIP." },
+    ],
+    specs: [
+      { label: "Input", value: "JPG, PNG, WebP, HEIC/HEIF, AVIF, BMP, GIF (first frame)" },
+      { label: "Output", value: "JPG, PNG, WebP, AVIF" },
+      { label: "Batch", value: "Up to 30 images, 25 MB each" },
+      { label: "HEIC decoder", value: "libheif (WebAssembly, LGPL-3.0)" },
+      { label: "AVIF encoder", value: "Browser, or libavif (WebAssembly) on your device" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["JPG", "PNG", "WebP", "HEIC", "AVIF", "BMP", "GIF"],
+    privacy: "Images are converted in your browser and never uploaded. The HEIC and AVIF decoders are downloaded from this site only when needed.",
+    examples: [
+      { title: "iPhone photo to JPG", body: "IMG_2041.HEIC (2.1 MB, 4032 × 3024) → IMG_2041.jpg at 85% quality, about 2–3 MB, opening on any device." },
+      { title: "Logo to JPG", body: "A transparent PNG logo converted to JPG gets a white background (or any colour you pick) instead of black." },
+      { title: "Website images", body: "Ten 1.5 MB JPG photos resized to 1600 px wide and saved as WebP at 80% often come out around 150–300 KB each." },
+    ],
+    faqs: [
+      { q: "Can I convert HEIC to JPG?", a: "Yes. HEIC photos from iPhones are decoded on your device with libheif, so it works even in browsers that can't open HEIC themselves." },
+      { q: "What happens to transparency when converting to JPG?", a: "JPG can't store transparency, so transparent areas are filled with a background colour — white unless you choose another. PNG, WebP and AVIF keep transparency." },
+      { q: "Are animated GIFs supported?", a: "Only the first frame is converted, as a still image. The animation isn't preserved, and the tool tells you when a GIF is animated." },
+      { q: "Why is AVIF conversion slower?", a: "Many browsers can't create AVIF files, so a WebAssembly encoder does it on your device. AVIF compresses very well but takes longer to encode." },
+      { q: "Are my images uploaded?", a: "No. Everything runs in your browser." },
+      { q: "Does converting improve quality?", a: "No — converting can't add detail that isn't there. Converting a JPG to PNG makes the file larger without making it sharper." },
+    ],
+    related: ["image-compressor", "image-resizer", "image-to-pdf", "image-to-text"],
+    searchTerms: ["image converter", "convert image", "heic to jpg", "heic", "avif", "webp to jpg", "jpg to png", "png to jpg", "jpg to webp", "png to webp", "bmp to jpg", "gif to png", "photo format", "iphone photo"],
+    published: "2026-11-12",
+    updated: "2026-11-12",
+  },
+  {
+    slug: "image-to-text",
+    name: "Image to Text (OCR)",
+    category: "image",
+    alsoIn: ["text"],
+    icon: "ocr",
+    short: "Extract text from photos, screenshots and scans — English, Hindi, Gujarati and more.",
+    intro:
+      "Pull the text out of a photo, screenshot or scanned page. Choose the language, tidy the image if needed, then copy the text or download it as TXT or Word — all done on your device.",
+    what:
+      "An image to text converter uses OCR (optical character recognition) to turn the words in a picture into text you can edit, search and copy. ZSpace Tools' Image to Text converter uses Tesseract, a long-established open-source OCR engine, running in your browser with language models for English, Hindi, Gujarati, Spanish, French and German.",
+    how:
+      "Tesseract's neural-network (LSTM) recogniser reads the image line by line using the language models you pick. Before reading, a copy of your image can be rotated, cropped to the text, converted to greyscale, given more contrast and enlarged — small text is upscaled automatically because OCR works best at around 300 DPI. The engine and models are served from this site and cached by your browser after the first use. You get an overall confidence score and a count of uncertain words, so you know when to check the result carefully.",
+    seo: {
+      title: "Image to Text Converter – Extract Text from Images Online",
+      description:
+        "Extract text from images online for free with OCR. Supports JPG, PNG, WebP, BMP and TIFF in English, Hindi, Gujarati, Spanish, French and German. Runs on your device.",
+      keyword: "Image to Text Converter",
+      secondary: ["OCR online", "extract text from image", "image to text", "JPG to text", "PNG to text", "photo to text", "screenshot to text", "online OCR tool", "extract text from scanned documents"],
+    },
+    features: [
+      { title: "Six languages", body: "English, Hindi, Gujarati, Spanish, French and German — combine up to three for mixed-language text." },
+      { title: "Clean up first", body: "Rotate, crop to the text, greyscale, contrast and upscaling — on a copy, never your original." },
+      { title: "Editable result", body: "Text appears in an editor next to the image so you can compare and correct it." },
+      { title: "Confidence shown", body: "Overall confidence and the number of uncertain words tell you how carefully to check." },
+      { title: "Copy, TXT or Word", body: "Copy the text, or download it as a .txt or .docx file." },
+      { title: "Private", body: "Your image is read on your device. Nothing is uploaded." },
+    ],
+    steps: [
+      { title: "Add an image", body: "A photo, screenshot or scan in JPG, PNG, WebP, BMP or TIFF." },
+      { title: "Pick the language", body: "Choose the language(s) in the image. Rotate or crop if the text is sideways or surrounded by clutter." },
+      { title: "Extract and check", body: "Press Extract text, review the result next to the image, then copy or download it." },
+    ],
+    specs: [
+      { label: "Engine", value: "Tesseract 5 (LSTM) via tesseract.js" },
+      { label: "Languages", value: "English, Hindi, Gujarati, Spanish, French, German" },
+      { label: "Input", value: "JPG, PNG, WebP, BMP, GIF, TIFF — up to 25 MB" },
+      { label: "Output", value: "Editable text, TXT, DOCX" },
+      { label: "First use", value: "Downloads ~4 MB engine + 1–3 MB per language (cached)" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["JPG", "PNG", "WebP", "BMP", "TIFF", "TXT", "DOCX"],
+    privacy: "Images are read in your browser and never uploaded. The OCR engine and language data are downloaded from this site and cached by your browser.",
+    examples: [
+      { title: "A screenshot", body: "A screenshot of an email reads almost perfectly — clean digital text usually scores over 90% confidence." },
+      { title: "A Hindi notice", body: "Choose Hindi (add English if the notice mixes both) to read a printed Devanagari notice." },
+      { title: "A phone photo of a page", body: "Rotate it upright, crop to the page and add a little contrast before extracting — accuracy improves noticeably." },
+    ],
+    faqs: [
+      { q: "How accurate is the OCR?", a: "Very good for clear, printed text and screenshots; lower for blurry photos, low light, small text, unusual fonts and complex layouts. It's never 100% — always check important details like names, numbers and amounts." },
+      { q: "Can it read handwriting?", a: "Only poorly. Tesseract is trained on printed text, so handwriting is often misread." },
+      { q: "Does it keep tables?", a: "Text in simple tables is read row by row, but the table structure isn't rebuilt. Complex tables may come out out of order." },
+      { q: "Which languages are supported?", a: "English, Hindi, Gujarati, Spanish, French and German. Pick every language that appears in the image, up to three." },
+      { q: "Are my images uploaded?", a: "No. OCR runs in your browser. Only the OCR engine and language files are downloaded — from this site, not a third party." },
+      { q: "Can I extract text from a PDF?", a: "For PDFs, use the PDF to Word Converter — it keeps the PDF's existing text and can OCR scanned pages." },
+    ],
+    related: ["pdf-to-word", "image-converter", "word-counter"],
+    searchTerms: ["ocr", "image to text", "extract text", "photo to text", "picture to text", "screenshot to text", "scan to text", "jpg to text", "png to text", "text recognition", "hindi ocr", "gujarati ocr", "copy text from image"],
+    published: "2026-11-12",
+    updated: "2026-11-12",
+  },
+  {
+    slug: "pdf-to-excel",
+    name: "PDF to Excel Converter",
+    category: "pdf",
+    alsoIn: ["conversion"],
+    icon: "pdf-table",
+    short: "Pull tables out of PDFs into Excel (XLSX) or CSV — numbers stay numbers, IDs stay exact.",
+    intro:
+      "Turn tables in a PDF — bank statements, invoices, price lists, reports — into an editable Excel spreadsheet. Preview every table before you download, and keep account numbers, dates and amounts exactly as they were.",
+    what:
+      "A PDF to Excel converter finds the tables in a PDF and puts each value into its own spreadsheet cell. ZSpace Tools' PDF to Excel Converter detects table rows and columns from the position of text on each page, joins tables that continue across pages, and creates an .xlsx file where amounts are real numbers with their original formatting and identifiers stay as text.",
+    how:
+      "PDFs don't store tables — only text placed at positions. The converter reads every word's position with pdf.js, splits each line into cells wherever there's a clear gap, and finds runs of lines whose cells line up into columns. Column edges come from where the cells actually sit, so right-aligned amounts and a header spanning two columns are handled. Lines that only continue a cell above (a long description wrapping onto a second line) are joined back into their row, and a table that carries on to the next page under the same header becomes one sheet. Each value is then typed carefully: 1,20,000.50 or $1,234.56 becomes a number formatted to look the same; dates, leading zeros (00123), account numbers longer than 15 digits and Dr/Cr amounts stay text so Excel can't change them. Scanned pages can be read with OCR first.",
+    seo: {
+      title: "PDF to Excel Converter – Convert PDF Tables to XLSX Online",
+      description:
+        "Convert PDF tables to Excel (XLSX) or CSV online for free. Bank statements, invoices and reports become editable spreadsheets — numbers stay numbers, IDs stay exact. Runs on your device.",
+      keyword: "PDF to Excel Converter",
+      secondary: ["convert PDF to Excel", "PDF to XLSX", "PDF table to Excel", "extract tables from PDF", "PDF to spreadsheet", "online PDF to Excel converter", "convert PDF data to Excel"],
+    },
+    features: [
+      { title: "Real table detection", body: "Rows and columns are worked out from where the text sits, including right-aligned amounts and empty cells." },
+      { title: "Multi-page tables", body: "A table that continues on the next page under the same header becomes one sheet, without the repeated header." },
+      { title: "Numbers you can sum", body: "1,20,000.50, ₹2,499, $1,234.56, (1,234.00) and 12.5% become Excel numbers that still look the same." },
+      { title: "Nothing changed silently", body: "Dates, leading zeros, long account numbers and Dr/Cr amounts are kept as text exactly as printed." },
+      { title: "Preview before download", body: "See every table, choose which to include, and pick a sheet per table or one combined sheet." },
+      { title: "Scanned PDFs", body: "OCR reads tables in scanned pages (6 languages). Without OCR you're told clearly instead of getting an empty file." },
+    ],
+    steps: [
+      { title: "Add your PDF", body: "Drop it in and choose all pages or a range like 2-5." },
+      { title: "Extract tables", body: "Turn on OCR if the PDF is scanned, then press Extract tables." },
+      { title: "Check and download", body: "Review the tables, untick any you don't need, and download XLSX or CSV." },
+    ],
+    specs: [
+      { label: "Output", value: "XLSX (Excel 2007+, Google Sheets, LibreOffice) and CSV (UTF-8)" },
+      { label: "Detects", value: "Rows, columns, headers, wrapped cells, tables across pages" },
+      { label: "Numbers", value: "Indian & Western grouping, currency, negatives, percentages" },
+      { label: "Kept as text", value: "Dates, leading zeros, IDs over 15 digits, Dr/Cr, phone numbers" },
+      { label: "Limits", value: "60 MB, 300 pages" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF", "XLSX", "CSV"],
+    privacy: "Your PDF is read in your browser and never uploaded. OCR language data, if you use it, is downloaded from this site and cached by your browser.",
+    examples: [
+      { title: "A bank statement", body: "A 2-page statement with Date, Description, Debit, Credit and Balance columns becomes one sheet; a description wrapped onto two lines stays in one cell, and 1,20,000.00 is a number shown with Indian grouping." },
+      { title: "An invoice", body: "The items table and the tax table on the same page become two separate sheets; the thank-you note between them is left out." },
+      { title: "Customer codes", body: "00123 and 1234567890123456 stay exactly as printed instead of turning into 123 and 1.23457E+15." },
+    ],
+    faqs: [
+      { q: "Will every PDF table convert perfectly?", a: "Tables with clear columns convert well. Tables with merged cells, multi-line headers, rotated text or no spacing between columns may need tidying in Excel. Always preview — and check totals — before relying on the data." },
+      { q: "Why are some values text, not numbers?", a: "To avoid silently changing your data. Dates (formats differ by country), leading zeros, account numbers longer than 15 digits (Excel would round them) and Dr/Cr amounts stay exactly as printed. You can convert them in Excel if you want." },
+      { q: "Can it convert scanned PDFs?", a: "Yes, with OCR turned on. Scanned pages are pictures, so the text is recognised first — check numbers carefully afterwards, as OCR can misread digits." },
+      { q: "Is my PDF uploaded?", a: "No. Extraction runs entirely in your browser." },
+      { q: "What if no table is found?", a: "You'll see the text of each page as rows instead, split into cells at wide gaps — useful for lists that aren't laid out as tables." },
+      { q: "Can I get CSV instead of Excel?", a: "Yes. CSV is UTF-8 with a byte-order mark so Excel shows ₹ and accents correctly. Note that Excel may reformat numbers in a CSV when it opens it; XLSX keeps them exact." },
+    ],
+    related: ["excel-to-pdf", "pdf-to-word", "image-to-text", "csv-to-json"],
+    searchTerms: ["pdf to excel", "pdf to xlsx", "pdf to csv", "extract table", "pdf table", "bank statement to excel", "invoice to excel", "pdf to spreadsheet", "convert pdf", "tabula"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "excel-to-pdf",
+    name: "Excel to PDF Converter",
+    category: "pdf",
+    alsoIn: ["conversion"],
+    icon: "sheet-pdf",
+    short: "Turn Excel (XLSX) and CSV files into neat, paginated PDFs with your page settings.",
+    intro:
+      "Convert a spreadsheet into a clean PDF you can share or print. Choose the worksheets, paper size, orientation and scaling, repeat header rows on every page, and preview the result before you download.",
+    what:
+      "An Excel to PDF converter turns a workbook into fixed pages that look the same everywhere. ZSpace Tools' Excel to PDF Converter reads your .xlsx file — values, number formats, fonts, colours, borders, merged cells, column widths and pictures — and lays it out on real PDF pages with selectable text, entirely in your browser.",
+    how:
+      "The workbook is read with ExcelJS. Each cell's displayed text is produced with Excel's own number-format rules (so ₹1,20,000.00, 33.0% and 13 Nov 2026 look as they do in Excel), and formulas show the result Excel saved — they're never recalculated. The sheet is then drawn with pdf-lib: column widths and row heights become points, wrapped rows are sized to fit, text spills into empty neighbouring cells as in Excel, and merged cells, fills and borders are reproduced. If a sheet is wider than the page it's either scaled to fit or split into column bands printed down, then across — like Excel. Header rows can repeat at the top of every page, and page numbers are added in the footer.",
+    seo: {
+      title: "Excel to PDF Converter – Convert XLS and XLSX to PDF Online",
+      description:
+        "Convert Excel XLSX and CSV to PDF online for free. Pick sheets, paper size, orientation, fit to width, repeated headers and page numbers, then preview. Runs on your device.",
+      keyword: "Excel to PDF Converter",
+      secondary: ["Excel to PDF", "XLSX to PDF", "XLS to PDF", "convert spreadsheet to PDF", "Excel spreadsheet to PDF", "online Excel to PDF converter"],
+    },
+    features: [
+      { title: "Looks like your sheet", body: "Number and date formats, fonts, fill colours, borders, merged cells, column widths and pictures are kept." },
+      { title: "Your page settings", body: "A4, A3, Letter or Legal; portrait, landscape or automatic; narrow, normal, wide or custom margins." },
+      { title: "Fit wide sheets", body: "Print at actual size, fit all columns to the page width, or fit a whole sheet on one page." },
+      { title: "Repeat header rows", body: "Use the workbook's Print Titles or repeat the first 1–3 rows on every page." },
+      { title: "Choose worksheets", body: "Include all sheets or just the ones you need; hidden sheets are left out by default." },
+      { title: "Preview, then download", body: "See every page before downloading a text-selectable PDF with page numbers." },
+    ],
+    steps: [
+      { title: "Add a spreadsheet", body: "Drop in an .xlsx or .csv file." },
+      { title: "Set up the pages", body: "Choose worksheets, paper, orientation, scaling and headers — the preview updates as you go." },
+      { title: "Download the PDF", body: "Check the preview and download." },
+    ],
+    specs: [
+      { label: "Input", value: "XLSX, XLSM (macros never run), CSV. Old .xls: re-save as .xlsx" },
+      { label: "Paper", value: "A4, A3, Letter, Legal — portrait or landscape" },
+      { label: "Scaling", value: "Actual size, fit to width, fit to page" },
+      { label: "Formulas", value: "Saved results shown; not recalculated" },
+      { label: "Not included", value: "Charts, shapes, conditional formatting" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["XLSX", "CSV", "PDF"],
+    privacy: "Your workbook is read and turned into a PDF in your browser. It's never uploaded or stored.",
+    examples: [
+      { title: "A wide report", body: "A 30-column sheet is switched to landscape and scaled so every column fits across one page, instead of being cut over several." },
+      { title: "A long price list", body: "A 150-row list prints over several A4 pages with the header row repeated at the top of each page and “Page 2 of 4” in the footer." },
+      { title: "Currency and dates", body: "Cells formatted as ₹#,##0.00 and dd mmm yyyy appear as ₹1,20,000.00 and 13 Nov 2026, exactly as in Excel." },
+    ],
+    faqs: [
+      { q: "Will the PDF look exactly like Excel?", a: "Close, but not pixel-identical. Text uses an embedded font similar to Calibri rather than Excel's own, and charts, shapes, conditional formatting and text boxes aren't drawn. Check the preview before sharing." },
+      { q: "Are formulas recalculated?", a: "No. The PDF shows the result Excel saved in the file. If a formula has no saved result (for example a file created by another program), the cell is blank and you're told — open and save it in Excel first." },
+      { q: "Can I convert .xls files?", a: "Not directly. The old .xls format can't be read reliably in the browser. Open it in Excel, Google Sheets or LibreOffice, save as .xlsx, then convert." },
+      { q: "How do I fit a wide sheet on the page?", a: "Choose “Fit columns to width” (the default) and, if needed, landscape. For a small sheet you want on one page, choose “Fit sheet on a page”." },
+      { q: "Is my spreadsheet uploaded?", a: "No. Everything runs in your browser." },
+      { q: "Can the PDF text be copied?", a: "Yes. Text is real PDF text, so it can be searched and copied." },
+    ],
+    related: ["pdf-to-excel", "word-to-pdf", "pdf-compressor"],
+    searchTerms: ["excel to pdf", "xlsx to pdf", "xls to pdf", "csv to pdf", "spreadsheet to pdf", "convert excel", "print excel", "sheet to pdf", "workbook"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "pdf-editor",
+    name: "PDF Editor",
+    category: "pdf",
+    icon: "pdf-edit",
+    short: "Add text, images, shapes, drawings, highlights and notes to any PDF — then download it.",
+    intro:
+      "Edit a PDF right in your browser: type text, place images, draw, add rectangles, circles and arrows, highlight or underline, and leave sticky notes. Move and resize anything, undo freely, then download the edited PDF.",
+    what:
+      "A PDF editor lets you change a PDF without the original file it was made from. ZSpace Tools' PDF Editor adds new content on top of your pages — text boxes, images, shapes, freehand drawing, highlights, underlines and sticky-note comments — and saves them into the PDF, keeping the original text and graphics exactly as they were.",
+    how:
+      "Pages are displayed with pdf.js. Everything you add lives in a layer above the page, in the page's own coordinates, so it stays in place at any zoom. When you download, each addition is written into the PDF with pdf-lib using the same coordinates — accounting for the page's size, crop box and rotation — so it appears exactly where you put it. Text is real PDF text (Helvetica, Times or Courier, or an embedded Noto Sans for characters like ₹); highlights use a multiply blend so the text underneath stays readable; notes become real PDF comments that open in any PDF reader. The original page content is never rasterised.",
+    seo: {
+      title: "Edit PDF Online – Add Text, Images, Shapes and Annotations",
+      description:
+        "Edit PDF files online for free: add text, images, shapes, arrows, freehand drawing, highlights and notes, then download. Original content stays intact and your file never leaves your device.",
+      keyword: "PDF Editor",
+      secondary: ["edit PDF online", "free PDF editor", "add text to PDF", "add image to PDF", "annotate PDF", "edit PDF document", "PDF text editor", "PDF annotation tool"],
+    },
+    features: [
+      { title: "Text and text boxes", body: "Type anywhere; choose size, colour, bold and font. Text wraps inside its box and stays real, selectable text." },
+      { title: "Images", body: "Add a logo, stamp or photo (PNG, JPG or WebP) and resize it without distortion." },
+      { title: "Shapes and drawing", body: "Rectangles, circles, lines, arrows and freehand ink in any colour and thickness." },
+      { title: "Highlight, underline, notes", body: "Mark up text and leave sticky-note comments that open in Acrobat, Preview and other readers." },
+      { title: "Move, resize, undo", body: "Select anything to move or resize it; undo and redo every step." },
+      { title: "Original stays sharp", body: "Your additions are written on top — the page's own text and vector graphics are untouched." },
+    ],
+    steps: [
+      { title: "Open a PDF", body: "Drop it in. Use the thumbnails to move between pages." },
+      { title: "Add and arrange", body: "Pick a tool, click or drag on the page, then move, resize and style what you added." },
+      { title: "Download", body: "Press Download PDF to save a copy with your edits." },
+    ],
+    specs: [
+      { label: "Add", value: "Text, images, rectangles, circles, lines, arrows, freehand, highlight, underline, notes" },
+      { label: "Text fonts", value: "Helvetica, Times, Courier; Noto Sans for other characters" },
+      { label: "History", value: "Undo / redo (Ctrl+Z / Ctrl+Shift+Z)" },
+      { label: "Pages", value: "Any size and orientation, rotated pages supported" },
+      { label: "Editing existing text", value: "Not supported (overlay editing only)" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF", "PNG", "JPG"],
+    privacy: "Your PDF and any images you add stay in your browser. Nothing is uploaded or stored.",
+    examples: [
+      { title: "Fill in a form by hand", body: "Click the Text tool, click on each blank line and type — the text is placed exactly there in the downloaded PDF." },
+      { title: "Review a draft", body: "Highlight a sentence, draw an arrow to it and add a note saying what to change; the note opens as a comment in any PDF reader." },
+      { title: "Add a logo", body: "Use the Image tool to place a PNG logo on page 1, drag it to the corner and resize it." },
+    ],
+    faqs: [
+      { q: "Can I change the existing text in my PDF?", a: "No. PDFs store text as positioned glyphs, so rewriting it reliably isn't possible in the browser, and we won't fake it by hiding text under a white box. You can add new text, or cover something with a white filled rectangle — but the original text is still in the file underneath." },
+      { q: "Will my edits be in the right place?", a: "Yes. Additions are stored in the page's coordinates and written with the same maths used to display it, including rotated pages and unusual page sizes." },
+      { q: "Is the original content preserved?", a: "Yes. Pages aren't turned into images; your additions are drawn on top of the existing content." },
+      { q: "Are my files uploaded?", a: "No. Editing and saving happen in your browser." },
+      { q: "Can I edit password-protected PDFs?", a: "No — open the PDF with its password in a reader, save an unlocked copy and edit that." },
+      { q: "Can I add text in Hindi or other scripts?", a: "Yes. Text in scripts like Devanagari or Gujarati is drawn by your browser and embedded as a sharp image so it looks right, though it won't be selectable text in the PDF." },
+    ],
+    related: ["sign-pdf", "pdf-organizer", "pdf-merger", "pdf-splitter"],
+    searchTerms: ["pdf editor", "edit pdf", "annotate pdf", "add text to pdf", "add image to pdf", "write on pdf", "draw on pdf", "highlight pdf", "pdf comment", "fill pdf", "markup"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "pdf-organizer",
+    name: "PDF Page Organizer",
+    category: "pdf",
+    icon: "pdf-grid",
+    short: "Reorder, rotate, delete, duplicate and extract PDF pages with drag and drop.",
+    intro:
+      "See every page of your PDF as a thumbnail and rearrange it the way you need. Drag pages into order, rotate or delete them, duplicate pages, pull out a selection as a new PDF, and undo anything.",
+    what:
+      "A PDF page organizer lets you manage the pages of a PDF visually. ZSpace Tools' PDF Page Organizer shows page thumbnails you can drag to reorder, and lets you rotate, delete, duplicate, reverse and extract pages — then builds a real new PDF with exactly those pages, in that order.",
+    how:
+      "Thumbnails are rendered with pdf.js only when they scroll into view, one at a time, so even long PDFs stay responsive. Your changes are kept as a list of page references with an added rotation — nothing is rebuilt until you download. Then pdf-lib copies each page from the original into a new PDF in your order (copying a page twice for duplicates), adds your rotation to the page's existing /Rotate value, and saves. Page content, links and comments on each page are carried over; the original file isn't changed.",
+    seo: {
+      title: "Organize PDF Pages – Reorder, Rotate, Delete and Extract Pages",
+      description:
+        "Organize PDF pages online for free: drag to reorder, rotate, delete, duplicate, reverse and extract pages, with undo. Pages are processed on your device.",
+      keyword: "Organize PDF",
+      secondary: ["organize PDF pages", "reorder PDF pages", "rearrange PDF pages", "delete PDF pages", "rotate PDF pages", "extract PDF pages", "PDF page organizer", "arrange PDF online"],
+    },
+    features: [
+      { title: "Drag to reorder", body: "Drag a page — or a whole selection — to a new position, or use the arrow buttons from the keyboard." },
+      { title: "Rotate", body: "Turn single pages or every selected page by 90°; rotation is saved in the PDF itself." },
+      { title: "Delete and duplicate", body: "Remove pages you don't need, or copy a page (for example a form you'll fill twice)." },
+      { title: "Extract selection", body: "Save just the selected pages as a separate PDF." },
+      { title: "Reverse and reset", body: "Reverse the whole order in one click, or go back to the original." },
+      { title: "Undo and redo", body: "Every change can be undone, and nothing touches your file until you download." },
+    ],
+    steps: [
+      { title: "Open a PDF", body: "Drop it in — page thumbnails appear as you scroll." },
+      { title: "Rearrange", body: "Drag pages into order; select pages to rotate, delete, duplicate or extract them." },
+      { title: "Download", body: "Download the reorganised PDF, or extract the selected pages." },
+    ],
+    specs: [
+      { label: "Actions", value: "Reorder, rotate ±90°, delete, duplicate, reverse, extract" },
+      { label: "Selection", value: "Click to select; select all / deselect" },
+      { label: "History", value: "Undo, redo, reset order" },
+      { label: "Kept", value: "Page content, links and annotations" },
+      { label: "Limits", value: "100 MB, 1,000 pages" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF"],
+    privacy: "Your PDF is rearranged in your browser and never uploaded.",
+    examples: [
+      { title: "A scanned document out of order", body: "Drag page 5 to the front, rotate the two sideways pages, delete the blank page and download." },
+      { title: "Pull out an annexure", body: "Select pages 12–15 and press Extract to save them as their own PDF." },
+      { title: "Back-to-front scan", body: "Press Reverse to flip the page order of a stack scanned from the last page." },
+    ],
+    faqs: [
+      { q: "Does rotating change the actual PDF?", a: "Yes. The rotation is written into each page of the downloaded PDF, so it opens the right way up everywhere." },
+      { q: "Are deleted pages really removed?", a: "Yes. The downloaded PDF is built only from the pages you kept, so deleted pages aren't hidden — they're gone from that file." },
+      { q: "Is my original file changed?", a: "No. You download a new PDF; the file on your device stays as it was." },
+      { q: "How do I move several pages at once?", a: "Select them, then drag any selected page — the whole selection moves together." },
+      { q: "Is there a page limit?", a: "Up to 1,000 pages and 100 MB, because everything is processed in your browser's memory." },
+      { q: "Are my files uploaded?", a: "No. Everything happens in your browser." },
+    ],
+    related: ["pdf-editor", "pdf-splitter", "pdf-merger", "pdf-compressor"],
+    searchTerms: ["organize pdf", "reorder pdf", "rearrange pdf", "rotate pdf", "delete pdf pages", "remove pages", "extract selected pages", "duplicate page", "reverse pdf", "sort pdf pages", "move pages"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "sign-pdf",
+    name: "Sign PDF",
+    category: "pdf",
+    icon: "signature",
+    short: "Draw, type or upload your signature and place it on any page of a PDF.",
+    intro:
+      "Sign a PDF without printing it. Draw your signature with a mouse or finger, type it in a handwriting-style font, or upload an image — then place it on the page, add the date, and download the signed PDF.",
+    what:
+      "Sign PDF adds an image of your signature to a PDF document. ZSpace Tools' Sign PDF lets you create a signature three ways, drag it onto any page, resize, move or rotate it, add a date or your name, and download a PDF with the signature embedded exactly where you placed it. It's a visual signature — not a certificate-based digital signature.",
+    how:
+      "Your signature becomes a transparent PNG — drawn on a smoothed canvas, typed in a script font, or uploaded with an optional white-background removal — and is trimmed to its edges. On the page it lives in the page's own coordinates, so placement is the same at any zoom. When you download, pdf-lib embeds the image into the PDF at exactly that position, size and angle (accounting for the page's size and rotation), and adds any date or name as text. The rest of the document is untouched. Signatures are kept only in memory while the page is open and are discarded when you leave or start again.",
+    seo: {
+      title: "Sign PDF Online – Add Your Signature to PDF Documents",
+      description:
+        "Sign PDF online for free: draw, type or upload your signature, place it on any page, add the date and download. Your signature and file stay on your device.",
+      keyword: "Sign PDF",
+      secondary: ["sign PDF online", "add signature to PDF", "electronic signature PDF", "sign document online", "PDF signature tool", "insert signature into PDF", "sign PDF without printing"],
+    },
+    features: [
+      { title: "Draw, type or upload", body: "Sign with a mouse, finger or stylus; type your name in one of three handwriting styles; or upload a picture of your signature." },
+      { title: "Clean signatures", body: "Drawn and typed signatures are transparent; uploaded ones can have their white background removed and are trimmed." },
+      { title: "Place anywhere", body: "Drag onto the page, then move, resize and rotate — on one page or copied to every page." },
+      { title: "Date and name", body: "Add today's date in your preferred format, or your name or initials." },
+      { title: "Exact placement", body: "What you see is where it's embedded, on any page size or rotation." },
+      { title: "Private", body: "Your signature and document never leave your device and aren't stored." },
+    ],
+    steps: [
+      { title: "Open the PDF", body: "Drop in the document you need to sign." },
+      { title: "Create your signature", body: "Draw, type or upload it." },
+      { title: "Place and download", body: "Drag it into position, add a date if needed, and download the signed PDF." },
+    ],
+    specs: [
+      { label: "Signature input", value: "Draw (mouse, touch, pen), type (3 fonts), upload PNG/JPG/WebP" },
+      { label: "Placement", value: "Move, resize, rotate; copy to all pages" },
+      { label: "Extras", value: "Date (4 formats), name or initials" },
+      { label: "Type", value: "Visual signature (image) — not a certificate-based digital signature" },
+      { label: "Storage", value: "None — kept in memory only while the page is open" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF", "PNG", "JPG"],
+    privacy: "Your document and signature stay in your browser. Nothing is uploaded, and signatures are discarded when you start again or leave the page.",
+    examples: [
+      { title: "A rental agreement", body: "Draw your signature once, place it on the last page above your name, add today's date beside it, and download." },
+      { title: "Initialling every page", body: "Type your initials, place them in the bottom corner of page 1, then use Copy to all pages." },
+      { title: "A scanned signature", body: "Upload a photo of your signature on white paper; the background is removed so only the ink appears on the page." },
+    ],
+    faqs: [
+      { q: "Is this a legally valid electronic signature?", a: "It depends. This tool adds a visual signature — an image of your signature — to the PDF. Many everyday agreements accept that, but some documents and countries require a certificate-based digital signature, identity verification or a specific signing process. Check what your document needs; for regulated documents use an approved e-signature or digital-signature service." },
+      { q: "Is it a digital signature?", a: "No. It doesn't use a certificate, doesn't verify who signed, and doesn't lock the document against changes." },
+      { q: "Is my signature stored?", a: "No. It exists only in your browser's memory while the page is open and is discarded when you start again or leave. Nothing is uploaded." },
+      { q: "Can I sign on my phone?", a: "Yes. Draw with your finger on the signature pad, then drag the signature into place on the page." },
+      { q: "Will the signature stay in the right place?", a: "Yes. It's embedded at the exact position, size and angle shown, on any page size or rotation." },
+      { q: "Can I sign several pages?", a: "Yes. Place it on each page you need, or place it once and use Copy to all pages." },
+    ],
+    related: ["pdf-editor", "pdf-organizer", "pdf-to-word"],
+    searchTerms: ["sign pdf", "signature", "e-sign", "esign", "add signature", "electronic signature", "sign document", "initials", "draw signature", "signature pdf", "fill and sign"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "protect-pdf",
+    name: "Protect PDF",
+    category: "pdf",
+    icon: "lock",
+    short: "Add a password to a PDF with AES-256 encryption, plus optional print and copy restrictions.",
+    intro:
+      "Put a password on a PDF so only people who know it can open it. The file is genuinely encrypted with AES-256 and checked before you download it — and it never leaves your device.",
+    what:
+      "Protect PDF encrypts a PDF so that it can only be opened with the password you choose. ZSpace Tools uses qpdf — a long-established open-source PDF library — running in your browser to apply standard PDF encryption (AES-256, or AES-128 for very old readers), and can optionally restrict printing, copying and editing.",
+    how:
+      "Your PDF is passed to qpdf, compiled to WebAssembly and running in a background worker on your device. qpdf rewrites the file with the PDF standard's security handler: every stream and string is encrypted with AES, and the key is protected by your opening password. Optional restrictions are stored as permission flags, protected by a separate permissions password (a random one if you don't set your own). Before the download is offered, the new file is reopened with pdf.js to prove it refuses to open without the password and opens correctly with it. Passwords are held only in memory for the operation and cleared afterwards.",
+    seo: {
+      title: "Protect PDF – Add Password and Encrypt PDF Files Online",
+      description:
+        "Password protect a PDF online for free with real AES-256 encryption. Optional print, copy and edit restrictions. Encrypted on your device — your file and password are never uploaded.",
+      keyword: "Protect PDF",
+      secondary: ["password protect PDF", "lock PDF", "add password to PDF", "encrypt PDF online", "secure PDF document", "PDF password protection", "protect PDF from opening"],
+    },
+    features: [
+      { title: "Real encryption", body: "AES-256 by default (or AES-128 for very old readers) using qpdf — not a cosmetic lock." },
+      { title: "Checked before download", body: "The protected file is reopened to confirm it needs the password and opens correctly with it." },
+      { title: "Optional restrictions", body: "Limit printing, copying text, editing, and comments and forms, with your own permissions password." },
+      { title: "Password guidance", body: "See how strong your password is, with simple tips; confirm it so typos don't lock you out." },
+      { title: "Nothing stored", body: "Your password is used once in your browser and then cleared. It's never uploaded, saved or logged." },
+      { title: "Private", body: "The PDF is encrypted on your device and never uploaded." },
+    ],
+    steps: [
+      { title: "Add your PDF", body: "Drop in the PDF you want to protect." },
+      { title: "Choose a password", body: "Type it twice. Optionally restrict printing, copying or editing." },
+      { title: "Encrypt and download", body: "Press Encrypt PDF; once it's checked, download the protected file." },
+    ],
+    specs: [
+      { label: "Encryption", value: "AES-256 (PDF 2.0, Acrobat X+) or AES-128 (Acrobat 7+)" },
+      { label: "Engine", value: "qpdf (WebAssembly) — Apache-2.0" },
+      { label: "Restrictions", value: "Printing (full / low / none), copying, editing, comments & forms" },
+      { label: "Verification", value: "Reopened with and without the password before download" },
+      { label: "Limit", value: "100 MB" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF"],
+    privacy: "Your PDF and password stay in your browser. The password is used once and cleared; it's never uploaded, stored or sent to analytics.",
+    examples: [
+      { title: "A salary slip", body: "Protect a payslip with a password before emailing it; your colleague types the password to open it." },
+      { title: "Print-only report", body: "Allow printing but block copying and editing, with a permissions password only you know." },
+      { title: "Sharing with an old system", body: "Choose AES-128 if the recipient uses very old PDF software that doesn't support AES-256." },
+    ],
+    faqs: [
+      { q: "Is the PDF really encrypted?", a: "Yes. The whole file is encrypted with AES using the PDF standard's security handler, so its contents can't be read without the password. We reopen the result to confirm it asks for the password before you can download it." },
+      { q: "What if I forget the password?", a: "It can't be recovered — we never store it. Keep it somewhere safe, such as a password manager." },
+      { q: "Do printing and copying restrictions stop everything?", a: "No. Mainstream PDF apps respect them, but they aren't DRM: some software ignores them, and anyone who can see the page can photograph or retype it. Use them as a clear signal, not as strong protection." },
+      { q: "Which encryption should I choose?", a: "AES-256 is the strongest and works in Acrobat Reader X (2010) and every modern browser and PDF app. Choose AES-128 only if someone needs to open it in very old software." },
+      { q: "Is my file or password uploaded?", a: "No. Encryption happens entirely in your browser." },
+      { q: "Can I protect a PDF that already has a password?", a: "Unlock it first with Unlock PDF (you'll need its current password), then protect it again with the new one." },
+    ],
+    related: ["unlock-pdf", "pdf-editor", "sign-pdf"],
+    searchTerms: ["protect pdf", "password protect pdf", "lock pdf", "encrypt pdf", "add password to pdf", "secure pdf", "pdf password", "aes-256", "restrict printing", "pdf security"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "unlock-pdf",
+    name: "Unlock PDF",
+    category: "pdf",
+    icon: "unlock",
+    short: "Remove the password from a PDF you're allowed to open — using its correct password.",
+    intro:
+      "Remove the password from a PDF you have the right to open, so it opens without asking every time. Enter the document's password and download an unlocked copy — no guessing, no cracking, nothing uploaded.",
+    what:
+      "Unlock PDF removes password protection from a PDF when you know its password. ZSpace Tools uses qpdf in your browser to decrypt the document and save an unprotected copy, keeping its pages, text, images, links and form fields exactly as they were.",
+    how:
+      "PDFs can have two passwords. The opening (user) password is needed to view the file; the permissions (owner) password controls printing, copying and editing. The tool first checks which kind your PDF has. With the permissions password, qpdf decrypts the file completely. With only the opening password, the opening password is removed but the author's restrictions are kept — removing those needs the permissions password. A wrong password is simply refused; the tool never tries other passwords. The unlocked file is reopened with pdf.js to confirm it opens without a password before you download it.",
+    seo: {
+      title: "Unlock PDF – Remove Password from PDF Online",
+      description:
+        "Remove the password from a PDF online for free when you know it. Decrypt PDFs with qpdf in your browser — content stays intact, and your file and password are never uploaded.",
+      keyword: "Unlock PDF",
+      secondary: ["remove PDF password", "unlock PDF online", "remove password protection from PDF", "decrypt PDF", "PDF password remover", "open protected PDF"],
+    },
+    features: [
+      { title: "Uses your password", body: "Enter the PDF's password to remove it. Wrong passwords are refused — nothing is guessed or cracked." },
+      { title: "Knows both passwords", body: "Tells opening passwords and permissions passwords apart, and explains what each can remove." },
+      { title: "Lossless", body: "Pages, text, images, links, comments and forms are kept — nothing is turned into images." },
+      { title: "Checked", body: "The unlocked copy is reopened to confirm it opens without a password." },
+      { title: "Clear errors", body: "A wrong password gets a clear message and another try — never a broken file." },
+      { title: "Private", body: "Your PDF and password stay in your browser." },
+    ],
+    steps: [
+      { title: "Add the protected PDF", body: "Drop it in; the tool checks what kind of protection it has." },
+      { title: "Enter the password", body: "Type the PDF's password — or its permissions password to lift restrictions too." },
+      { title: "Download", body: "Download the unlocked copy." },
+    ],
+    specs: [
+      { label: "Supports", value: "RC4 40/128-bit, AES-128, AES-256 PDFs" },
+      { label: "Opening password", value: "Removed; existing restrictions kept" },
+      { label: "Permissions password", value: "Removes the password and all restrictions" },
+      { label: "Password guessing", value: "Never — the correct password is required" },
+      { label: "Engine", value: "qpdf (WebAssembly)" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF"],
+    privacy: "Your PDF and password stay in your browser. The password is used once and cleared; it's never uploaded, stored or logged.",
+    examples: [
+      { title: "A bank statement", body: "Statements often open with your date of birth or customer ID. Enter it once here, and the saved copy opens without asking." },
+      { title: "A restricted report", body: "A report opens freely but blocks printing. With its permissions password you can remove the restriction; without it, the tool explains why it can't." },
+      { title: "Wrong password", body: "Type the wrong password and you'll see “That password isn't correct” — try again; no file is produced." },
+    ],
+    faqs: [
+      { q: "Can this unlock a PDF if I don't know the password?", a: "No. It needs the correct password and never tries to guess, crack or bypass it. Only unlock documents you're entitled to open." },
+      { q: "What's the difference between the two PDF passwords?", a: "The opening (user) password is needed to view the PDF. The permissions (owner) password controls restrictions like printing and copying. A PDF can have either or both." },
+      { q: "Why are printing restrictions still there?", a: "You entered the opening password. That lets you open the file, but the author's restrictions are tied to the permissions password, so we keep them. Enter the permissions password to remove them too." },
+      { q: "Will the unlocked PDF look the same?", a: "Yes. The file is decrypted, not re-rendered, so text, images, links and forms are unchanged." },
+      { q: "Is my file or password uploaded?", a: "No. Everything happens in your browser." },
+      { q: "My PDF isn't protected — why can't I unlock it?", a: "If it opens without a password and has no restrictions, there's nothing to remove; the tool tells you so." },
+    ],
+    related: ["protect-pdf", "pdf-editor", "pdf-compressor"],
+    searchTerms: ["unlock pdf", "remove pdf password", "decrypt pdf", "pdf password remover", "open protected pdf", "remove password", "unlock", "bank statement password"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "watermark-pdf",
+    name: "Watermark PDF",
+    category: "pdf",
+    icon: "stamp",
+    short: "Stamp text or a logo across PDF pages — with opacity, rotation, position and tiling.",
+    intro:
+      "Add a text or logo watermark to your PDF — CONFIDENTIAL, DRAFT, your company logo or anything else. Set the opacity, angle and position, choose the pages, and see exactly how it will look before you download.",
+    what:
+      "A PDF watermark is text or an image placed on every page (or selected pages) to mark a document as confidential, a draft or yours. ZSpace Tools' Watermark PDF adds the watermark on top of your existing pages as real text or a picture, keeping the original content sharp and selectable.",
+    how:
+      "The watermark is turned into objects placed in each page's coordinates — the same objects drive the live preview (drawn over a pdf.js render) and the final file (written with pdf-lib), so the preview matches the download, including on rotated or odd-sized pages. Text watermarks are real PDF text in Helvetica, Times or Courier; image watermarks keep their transparency. Opacity is applied with PDF transparency, not by fading the page, and the original page content is never turned into an image.",
+    seo: {
+      title: "Add Watermark to PDF – Text and Image Watermark Online",
+      description:
+        "Add a text or image watermark to PDF online for free. Choose opacity, rotation, position, tiling and pages, with a live preview. Watermarked on your device — nothing is uploaded.",
+      keyword: "Watermark PDF",
+      secondary: ["add watermark to PDF", "PDF watermark", "insert logo into PDF", "add text watermark", "add image watermark", "stamp PDF", "watermark PDF pages"],
+    },
+    features: [
+      { title: "Text or logo", body: "Presets like CONFIDENTIAL and DRAFT, any custom text, or your PNG, JPG or WebP logo with transparency." },
+      { title: "Full control", body: "Font, size, colour, opacity, rotation, nine positions, a diagonal preset, margins — or drag it anywhere." },
+      { title: "Tiled watermarks", body: "Repeat the mark across the whole page for documents that must not be reused." },
+      { title: "Choose pages", body: "All, first, last, odd, even or a custom range like 2-5, 9." },
+      { title: "Accurate preview", body: "The preview uses the same placement as the download." },
+      { title: "Content preserved", body: "Pages aren't rasterised — the original text stays selectable and sharp." },
+    ],
+    steps: [
+      { title: "Add a PDF", body: "Drop in the document." },
+      { title: "Design the watermark", body: "Pick text or a logo, then adjust opacity, rotation, position and pages while watching the preview." },
+      { title: "Download", body: "Press Add watermark & download." },
+    ],
+    specs: [
+      { label: "Text", value: "Helvetica, Times, Courier (regular/bold); 8–160 pt" },
+      { label: "Images", value: "PNG (with transparency), JPG, WebP" },
+      { label: "Placement", value: "9 positions, diagonal centre, custom drag, tiled" },
+      { label: "Pages", value: "All, first, last, odd, even, custom ranges" },
+      { label: "Output", value: "Same pages, content untouched, watermark on top" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF", "PNG", "JPG", "WebP"],
+    privacy: "Your PDF and logo stay in your browser and are never uploaded.",
+    examples: [
+      { title: "Draft contract", body: "A red “DRAFT” at 25% opacity, rotated −45° across the centre of every page." },
+      { title: "Branded proposal", body: "Your logo at 15% of the page width in the bottom-right corner of pages 2 to the end." },
+      { title: "Sample document", body: "“SAMPLE” tiled across each page at low opacity so screenshots can't be reused." },
+    ],
+    faqs: [
+      { q: "Does a watermark stop people copying my PDF?", a: "No. It's a visible mark, not protection — someone with the right tools could remove or crop it. Use Protect PDF to control who can open the file." },
+      { q: "Will the original text stay selectable?", a: "Yes. The watermark is added on top; the page isn't turned into an image." },
+      { q: "Can I use a transparent PNG logo?", a: "Yes — transparent areas stay transparent, and you can lower the opacity further." },
+      { q: "Can I watermark only some pages?", a: "Yes: first, last, odd, even, or a custom list such as 1-3, 7, 10-end." },
+      { q: "Does the preview match the downloaded file?", a: "Yes. Both use the same coordinates, so the watermark lands exactly where you see it, including on landscape or rotated pages." },
+      { q: "Is my PDF uploaded?", a: "No. Watermarking happens in your browser." },
+    ],
+    related: ["add-page-numbers", "pdf-editor", "sign-pdf"],
+    searchTerms: ["watermark pdf", "add watermark", "pdf watermark", "stamp pdf", "confidential", "draft", "logo on pdf", "add logo to pdf", "text watermark", "image watermark"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "add-page-numbers",
+    name: "Add Page Numbers to PDF",
+    category: "pdf",
+    icon: "numbers",
+    short: "Number PDF pages in any corner — 1, 01, Page 1 of 10, Roman numerals — and skip cover pages.",
+    intro:
+      "Add page numbers to a PDF in a few clicks. Pick the corner and style, leave the cover pages out, start from any number, and add an optional header or footer — with a live preview of every page.",
+    what:
+      "Add Page Numbers to PDF writes page numbers onto the pages of an existing PDF. ZSpace Tools supports common styles (1, 01, Page 1, Page 1 of 10, 1 / 10, Roman numerals), custom prefixes and suffixes, skipping the first pages, a custom start number and page ranges, plus optional header and footer text.",
+    how:
+      "For each page that should be numbered, the tool works out the number to show (skipping the pages you leave out and starting from your chosen value) and places it with a margin from the chosen edge of that page — so it lands correctly on portrait, landscape and mixed page sizes. The same placement drives the live preview and the final PDF, written with pdf-lib as real text in Helvetica, Times or Courier. “Page 1 of N” counts only the numbered pages. Existing content isn't touched or rasterised.",
+    seo: {
+      title: "Add Page Numbers to PDF – Number PDF Pages Online",
+      description:
+        "Add page numbers to PDF online for free. Choose position, style (1, Page 1 of 10, Roman), start number and pages to skip, plus header and footer text. Runs on your device.",
+      keyword: "Add Page Numbers to PDF",
+      secondary: ["number PDF pages", "insert page numbers in PDF", "PDF page numbering", "add page numbers online", "PDF footer page numbers", "PDF header and footer", "number pages in a PDF document"],
+    },
+    features: [
+      { title: "Six positions", body: "Top or bottom; left, centre or right — placed the same distance from the edge on every page size." },
+      { title: "Seven styles", body: "1, 01, Page 1, Page 1 of 10, 1 / 10, I II III and i ii iii — with any prefix or suffix." },
+      { title: "Skip cover pages", body: "Leave the first pages unnumbered and start counting at 1 (or any number) where you want." },
+      { title: "Page ranges", body: "Number all pages, odd or even pages, or a custom range." },
+      { title: "Header & footer", body: "Optional text with {title}, {date}, {page} and {total} placeholders." },
+      { title: "Live preview", body: "Flip through pages to check every number before downloading." },
+    ],
+    steps: [
+      { title: "Add a PDF", body: "Drop in your document." },
+      { title: "Set up numbering", body: "Choose the position and style, pages to skip and the starting number." },
+      { title: "Download", body: "Check the preview and download the numbered PDF." },
+    ],
+    specs: [
+      { label: "Positions", value: "Top/bottom × left/centre/right" },
+      { label: "Styles", value: "1 · 01 · Page 1 · Page 1 of N · 1 / N · I · i" },
+      { label: "Start / skip", value: "Any start number; skip leading pages" },
+      { label: "Fonts", value: "Helvetica, Times, Courier; 6–36 pt; colour & opacity" },
+      { label: "Extras", value: "Header and footer text with placeholders" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF"],
+    privacy: "Your PDF is numbered in your browser and never uploaded.",
+    examples: [
+      { title: "Skip the cover", body: "A 20-page report: leave the first 2 pages unnumbered and the third page shows “1”; the last page shows “18”." },
+      { title: "Front matter in Roman numerals", body: "Number pages 1–4 as i–iv, then run the tool again on pages 5-end starting at 1." },
+      { title: "Formal footer", body: "Bottom right “Page 3 of 12” with the footer “Annual Report · 13 Nov 2026” on the left." },
+    ],
+    faqs: [
+      { q: "How do I start numbering on page 3?", a: "Set “Leave unnumbered first 2 pages” and “Start counting at 1”. Page 3 shows 1, and “of N” counts only the numbered pages." },
+      { q: "Will numbers sit correctly on landscape pages?", a: "Yes. Each number is placed relative to its own page, so portrait, landscape and mixed sizes all line up." },
+      { q: "Will the numbers cover my content?", a: "They're placed in the margin you choose (28 pt ≈ 10 mm by default). If your pages have content close to the edge, increase the margin or choose another corner — the preview shows the result." },
+      { q: "Can I use Roman numerals?", a: "Yes — upper-case (I, II, III) or lower-case (i, ii, iii)." },
+      { q: "Is the original PDF changed?", a: "No. You download a new copy with numbers added on top of the existing content." },
+      { q: "Is my file uploaded?", a: "No. Everything runs in your browser." },
+    ],
+    related: ["watermark-pdf", "pdf-editor", "pdf-organizer"],
+    searchTerms: ["page numbers", "number pdf pages", "add page numbers", "pdf page numbering", "pagination", "header footer pdf", "roman numerals", "page x of y", "footer"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
+  {
+    slug: "pdf-to-powerpoint",
+    name: "PDF to PowerPoint Converter",
+    category: "pdf",
+    alsoIn: ["conversion"],
+    icon: "slides",
+    short: "Turn PDF pages into PowerPoint slides — picture-perfect or with editable text.",
+    intro:
+      "Convert a PDF into a PowerPoint presentation. Keep every page looking exactly like the PDF as picture slides, or rebuild the text as editable text boxes — then download a PPTX that opens in PowerPoint, Keynote or Google Slides.",
+    what:
+      "A PDF to PowerPoint converter turns each PDF page into a slide in a .pptx file. ZSpace Tools offers two honest modes: layout-preserving slides (a high-quality picture of each page — exact, but not editable) and editable slides (text rebuilt as PowerPoint text boxes and tables over the page's graphics).",
+    how:
+      "In layout mode each page is rendered with pdf.js at the quality you choose and placed on its own slide, centred without stretching. In editable mode the page's text is read with its position, font and size, and grouped into paragraphs, headings and simple tables — the same analysis as our PDF to Word converter — which become PowerPoint text boxes; the page's shapes, colours and pictures can be kept as a background image drawn without the text, so the slide still looks like the page. Scanned pages have no text to extract, so they become picture slides, with OCR text optionally added to the speaker notes. The presentation is built with pptxgenjs and saved as a standard .pptx.",
+    seo: {
+      title: "PDF to PowerPoint Converter – Convert PDF to PPTX Online",
+      description:
+        "Convert PDF to PowerPoint (PPTX) online for free. Choose picture-perfect slides or editable text, 16:9, 4:3 or matching slide size, and page ranges. Converted on your device.",
+      keyword: "PDF to PowerPoint Converter",
+      secondary: ["PDF to PPT", "PDF to PPTX", "convert PDF to PowerPoint", "PDF to editable PowerPoint", "PDF presentation converter", "online PDF to PPT converter"],
+    },
+    features: [
+      { title: "Two clear modes", body: "Picture slides that look exactly like the PDF, or editable text boxes over the page's graphics." },
+      { title: "Right slide size", body: "Match the PDF's shape, or use 16:9 or 4:3 — pages are centred, never stretched." },
+      { title: "Editable text", body: "Paragraphs, headings, bold/italic, alignment and simple tables become real PowerPoint text." },
+      { title: "Choose pages", body: "Convert all pages, odd/even, or a range such as 1-5, 9." },
+      { title: "Scanned PDFs", body: "Kept as picture slides; OCR can put their text in the speaker notes." },
+      { title: "Private", body: "Converted in your browser — your PDF is never uploaded." },
+    ],
+    steps: [
+      { title: "Add a PDF", body: "Drop it in and choose which pages to convert." },
+      { title: "Pick a mode and size", body: "Keep the layout or get editable text; choose the slide size and image quality." },
+      { title: "Download the PPTX", body: "Open it in PowerPoint, Keynote or Google Slides." },
+    ],
+    specs: [
+      { label: "Output", value: "PPTX (PowerPoint 2007+, Keynote, Google Slides, LibreOffice)" },
+      { label: "Modes", value: "Layout-preserving pictures; editable text boxes & tables" },
+      { label: "Slide size", value: "Match PDF, 16:9 (13.33 × 7.5 in), 4:3 (10 × 7.5 in)" },
+      { label: "Image quality", value: "110, 150 or 220 DPI" },
+      { label: "Limits", value: "60 MB, 300 pages" },
+      { label: "Processing", value: "In your browser — nothing is uploaded" },
+    ],
+    formats: ["PDF", "PPTX"],
+    privacy: "Your PDF is converted in your browser and never uploaded.",
+    examples: [
+      { title: "A pitch deck exported as PDF", body: "Layout mode with Match PDF size brings back slides that look identical — perfect for presenting." },
+      { title: "A report to adapt", body: "Editable mode on pages 2-4 gives slides whose headings and paragraphs you can rewrite, with the page design behind them." },
+      { title: "A portrait PDF on 16:9", body: "Portrait pages are centred on widescreen slides with white space at the sides instead of being squashed." },
+    ],
+    faqs: [
+      { q: "Will the slides be editable?", a: "In editable mode, text becomes PowerPoint text boxes and simple tables. In layout mode each slide is a picture — it looks exact but text can't be edited. We never present picture slides as editable." },
+      { q: "Why does my editable slide look slightly different?", a: "Text is re-flowed by PowerPoint with the fonts on your computer, so line breaks can shift. Charts, layered graphics and complex tables may need adjusting." },
+      { q: "What about scanned PDFs?", a: "They contain pictures of text, not text, so they become picture slides. Turn on OCR to add the recognised text to each slide's speaker notes." },
+      { q: "Will it open in PowerPoint?", a: "Yes — it's a standard .pptx file that opens in PowerPoint 2007 and later, Keynote, Google Slides and LibreOffice Impress. Very old versions may display some features differently." },
+      { q: "Is my PDF uploaded?", a: "No. The conversion runs entirely in your browser." },
+      { q: "Can I convert only some pages?", a: "Yes — choose first, last, odd, even or a custom range." },
+    ],
+    related: ["pdf-to-word", "pdf-to-excel", "pdf-to-jpg"],
+    searchTerms: ["pdf to powerpoint", "pdf to ppt", "pdf to pptx", "convert pdf to slides", "pdf presentation", "pdf to keynote", "pdf to google slides", "editable powerpoint"],
+    published: "2026-11-13",
+    updated: "2026-11-13",
+  },
 ];
 
 /** Ideas on the roadmap — shown as "coming soon", never linked or indexed. */
 export const plannedTools: { name: string; category: CategoryId }[] = [
-  { name: "Image Format Converter", category: "conversion" },
-  { name: "PDF to Image", category: "conversion" },
   { name: "Lorem Ipsum Generator", category: "text" },
   { name: "Character Counter", category: "text" },
   { name: "Time Zone Converter", category: "date" },
@@ -2237,7 +3161,7 @@ export function getCategory(id: CategoryId) {
 }
 
 export function toolsInCategory(id: CategoryId) {
-  return tools.filter((t) => t.category === id);
+  return tools.filter((t) => t.category === id || t.alsoIn?.includes(id));
 }
 
 export function toolPath(slug: string) {

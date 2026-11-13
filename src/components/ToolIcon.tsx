@@ -1,4 +1,4 @@
-import { Ampersand, Bot, Globe, Network, Share2, Tags, BadgePercent, FileCode, FileCode2, Regex, Binary, Link2 as LinkSlug, Briefcase, Crop, Fingerprint, Palette, PenTool, Pilcrow, Receipt, CalendarDays, Clock, FileSpreadsheet, Landmark, Link, Braces, CaseSensitive, Cake, Code2, ReceiptIndianRupee, Ruler, Combine, FileImage, FileText, ImageIcon, KeyRound, Percent, QrCode, Repeat2, Scaling, Split, Type, Zap, type LucideProps } from "lucide-react";
+import { Hash, Lock, LockOpen, Presentation, Stamp, FilePenLine, LayoutGrid, Sheet, Signature, Table2, ArrowRightLeft, FileOutput, FilePen, Images, ScanText, Ampersand, Bot, Globe, Network, Share2, Tags, BadgePercent, FileCode, FileCode2, Regex, Binary, Link2 as LinkSlug, Briefcase, Crop, Fingerprint, Palette, PenTool, Pilcrow, Receipt, CalendarDays, Clock, FileSpreadsheet, Landmark, Link, Braces, CaseSensitive, Cake, Code2, ReceiptIndianRupee, Ruler, Combine, FileImage, FileText, ImageIcon, KeyRound, Percent, QrCode, Repeat2, Scaling, Split, Type, Zap, type LucideProps } from "lucide-react";
 import type { IconName } from "@/lib/tools";
 
 const map = {
@@ -44,6 +44,21 @@ const map = {
   share: Share2,
   entity: Ampersand,
   globe: Globe,
+  "pdf-word": FilePen,
+  "word-pdf": FileOutput,
+  "pdf-image": Images,
+  "convert-image": ArrowRightLeft,
+  ocr: ScanText,
+  "pdf-table": Table2,
+  "sheet-pdf": Sheet,
+  "pdf-edit": FilePenLine,
+  "pdf-grid": LayoutGrid,
+  signature: Signature,
+  lock: Lock,
+  unlock: LockOpen,
+  stamp: Stamp,
+  numbers: Hash,
+  slides: Presentation,
 } satisfies Record<IconName, React.ComponentType<LucideProps>>;
 
 export function ToolIcon({ name, ...props }: { name: IconName } & LucideProps) {

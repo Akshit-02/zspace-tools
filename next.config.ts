@@ -7,7 +7,7 @@ const isDev = process.env.NODE_ENV !== "production";
 // Next.js inline bootstrap scripts without a nonce-based setup.
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com`,
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
   // https: lets users preview their own Markdown images; images cannot execute code.
   "img-src 'self' data: blob: https:",
@@ -26,6 +26,13 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   poweredByHeader: false,
   turbopack: {
+    // qpdf-wasm's loader has Node-only branches that require fs/path/crypto; in the
+    // browser bundle those resolve to an empty module (they're never executed there).
+    resolveAlias: {
+      fs: { browser: "./src/lib/empty-module.ts" },
+      path: { browser: "./src/lib/empty-module.ts" },
+      crypto: { browser: "./src/lib/empty-module.ts" },
+    },
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],

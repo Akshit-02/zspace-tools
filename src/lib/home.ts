@@ -1,13 +1,13 @@
 /** Featured on the homepage "Popular tools" grid, in order (first is the large card). */
-export const popularSlugs = ["image-compressor", "invoice-generator", "pdf-merger", "emi-calculator", "image-cropper"];
+export const popularSlugs = ["image-compressor", "pdf-to-word", "pdf-editor", "sign-pdf", "invoice-generator"];
 
 /** Shown in the footer "Tools" column; the rest are one click away in /all-tools/. */
-export const footerSlugs = ["image-compressor", "image-cropper", "pdf-merger", "invoice-generator", "json-formatter", "emi-calculator", "gst-calculator", "color-picker", "meta-tag-generator"];
+export const footerSlugs = ["image-compressor", "image-cropper", "pdf-merger", "invoice-generator", "json-formatter", "emi-calculator", "gst-calculator", "color-picker", "meta-tag-generator", "pdf-to-word", "image-converter", "pdf-editor", "sign-pdf", "protect-pdf"];
 
 export const homeFaqs = [
   {
     q: "What is ZSpace Tools?",
-    a: "ZSpace Tools is a free collection of simple online tools for everyday tasks — compress, resize and crop images; compress, merge and split PDFs; create invoices; format JSON, HTML and CSS, test regular expressions, create meta tags, sitemaps and robots.txt, preview social link cards, encode HTML entities, convert CSV, write Markdown and generate UUIDs; pick colours and check contrast; calculate loan EMIs, GST, discounts, percentages, dates and age; convert units and text case; create QR codes and passwords. Each tool opens instantly and does one job well.",
+    a: "ZSpace Tools is a free collection of simple online tools for everyday tasks — compress, resize, crop and convert images (including HEIC); extract text from images with OCR; compress, merge, split, edit, sign, password-protect, unlock, watermark, number and reorganise PDFs; convert PDF to Word, Excel, PowerPoint and JPG, and Word or Excel to PDF; create invoices; format JSON, HTML and CSS, test regular expressions, create meta tags, sitemaps and robots.txt, preview social link cards, encode HTML entities, convert CSV, write Markdown and generate UUIDs; pick colours and check contrast; calculate loan EMIs, GST, discounts, percentages, dates and age; convert units and text case; create QR codes and passwords. Each tool opens instantly and does one job well.",
   },
   {
     q: "Is ZSpace Tools really free?",

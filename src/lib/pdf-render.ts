@@ -7,7 +7,7 @@ import type { PDFDocumentProxy } from "pdfjs-dist";
 
 let lib: Promise<typeof import("pdfjs-dist")> | null = null;
 
-async function pdfjs() {
+export async function pdfjs() {
   if (!lib) {
     lib = import("pdfjs-dist").then((m) => {
       m.GlobalWorkerOptions.workerSrc = `/pdfjs/pdf.worker.${m.version}.min.mjs`;
@@ -93,5 +93,36 @@ export async function firstPageThumb(bytes: Uint8Array, width: number): Promise<
     return null; // a missing thumbnail must never block the tool
   } finally {
     doc?.destroy();
+  }
+}
+
+/**
+ * Opens a PDF with pdf.js for page rendering or text extraction, converting
+ * failures into clear PdfErrors (password, damaged, not a PDF, empty).
+ */
+export async function openPdfjs(bytes: Uint8Array, name = "This PDF") {
+  const { PdfError, hasPdfHeader } = await import("./pdf-utils");
+  if (!hasPdfHeader(bytes)) throw new PdfError("not-pdf", `${name} isn't a PDF. Choose a file that ends in .pdf.`);
+  const m = await pdfjs();
+  const task = m.getDocument({
+    data: bytes.slice(),
+    cMapUrl: "/pdfjs/cmaps/",
+    cMapPacked: true,
+    standardFontDataUrl: "/pdfjs/standard_fonts/",
+    useWasm: false,
+    enableXfa: false,
+  });
+  try {
+    const doc = await task.promise;
+    if (doc.numPages === 0) throw new PdfError("empty", `${name} has no pages.`);
+    return { doc, lib: m, destroy: () => void task.destroy() };
+  } catch (e) {
+    void task.destroy();
+    if (e instanceof PdfError) throw e;
+    const n = (e as { name?: string })?.name;
+    // Some protected PDFs fail before pdf.js asks for a password; an /Encrypt entry tells us why.
+    const encrypted = n === "PasswordException" || /\/Encrypt[\s/<\d]/.test(new TextDecoder("latin1").decode(bytes.subarray(Math.max(0, bytes.length - 4096))) + new TextDecoder("latin1").decode(bytes.subarray(0, 4096)));
+    if (encrypted) throw new PdfError("encrypted", `${name} appears to be password protected. Please upload an unlocked copy.`);
+    throw new PdfError("damaged", `${name} couldn't be opened. It may be damaged or incomplete.`);
   }
 }

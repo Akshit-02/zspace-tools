@@ -392,10 +392,16 @@ export function Notice({ tone = "info", children }: { tone?: "info" | "error" | 
   );
 }
 
-export function ProgressBar({ value, label }: { value: number; label?: string }) {
+export function ProgressBar({ value, label, showLabel }: { value: number; label?: string; showLabel?: boolean }) {
   const pct = Math.max(0, Math.min(100, value));
   return (
     <div role="progressbar" aria-label={label ?? "Progress"} aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+      {showLabel && label && (
+        <p className="mb-2 flex justify-between gap-3 text-sm text-ink-2">
+          <span className="min-w-0 truncate">{label}</span>
+          <span className="font-mono">{Math.round(pct)}%</span>
+        </p>
+      )}
       <div className="h-1.5 overflow-hidden rounded-full bg-line">
         <motion.div className="h-full rounded-full bg-orange" animate={{ width: `${pct}%` }} transition={{ ease: "easeOut", duration: 0.3 }} />
       </div>

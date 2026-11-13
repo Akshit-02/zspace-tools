@@ -38,16 +38,35 @@
 | Robots.txt Generator | `/robots-txt-generator/` | Presets (block-all behind confirmation), multi-group rule builder, lint warnings, RFC 9309 tester (longest match, Allow ties, `*`/`$`) |
 | Open Graph Preview | `/open-graph-preview/` | Facebook/LinkedIn/WhatsApp/X simulations, image size check, local image preview, import from pasted page source (no fetching) |
 | HTML Entity Encoder & Decoder | `/html-entity-encoder/` | `entities` 8.1.0 (WHATWG decoding, 2,231 names), named/decimal/hex encoding per code point, issue reporting; output shown as text only |
+| PDF to Word Converter | `/pdf-to-word/` | pdf.js text/font/image extraction → layout analysis (`pdf-layout.ts`: lines, paragraphs, headings, alignment, two-column order, simple tables) → `docx` 9.12.0; scanned-page detection with Tesseract OCR or page image fallback |
+| Word to PDF Converter | `/word-to-pdf/` | docx-preview 0.4.1 render (sanitised) → browser print engine with per-section `@page` sizes; "paged" vs "flow" mode chosen by measurement; .doc rejected with guidance |
+| PDF to JPG & PNG | `/pdf-to-jpg/` | pdf.js page-by-page canvas render at 72/150/300 DPI (16 MP cap), JPG quality, background/transparent PNG, cancel, ZIP |
+| Image Converter | `/image-converter/` | Signature sniffing; native decode + libheif-js 1.23.5 (HEIC) and libavif via @jsquash/avif 2.1.1 (AVIF decode/encode) in a Web Worker; JPG flattening colour, resize, rename, ZIP |
+| Image to Text (OCR) | `/image-to-text/` | tesseract.js 7 + self-hosted LSTM core and best_int models (eng, hin, guj, spa, fra, deu); rotate/crop/greyscale/contrast/upscale on a copy; TXT/DOCX |
+| PDF to Excel Converter | `/pdf-to-excel/` | pdf.js text positions → table detection (`pdf-tables.ts`: gap-split cells, interval-clustered columns, wrapped-cell joining, multi-page stitching) → conservative typing (`cell-values.ts`) → ExcelJS 4.4.0 XLSX / CSV; OCR for scans |
+| Excel to PDF Converter | `/excel-to-pdf/` | ExcelJS read (cached formula results, SSF 0.11.2 number formats, fills, borders, merges, images) → pdf-lib renderer (`xlsx-pdf.ts`): paper/orientation/margins, fit width/page, column bands, repeated header rows, page numbers |
+| PDF Editor | `/pdf-editor/` | pdf.js page render + DOM overlay layer (`OverlayLayer`) → `pdf-overlay.ts` export with a display→user-space matrix (rotation/crop safe): text, images, shapes, ink, highlight, underline, real /Text notes; undo/redo |
+| PDF Page Organizer | `/pdf-organizer/` | Lazy thumbnails; reorder (drag & drop + keyboard), rotate, delete, duplicate, reverse, extract → pdf-lib `copyPages` + `/Rotate` |
+| Sign PDF | `/sign-pdf/` | Draw (smoothed canvas), type (self-hosted OFL script fonts), upload (white removal + trim) → overlay placement with rotate/resize, date/name, copy to all pages; visual signature only |
+| Protect PDF | `/protect-pdf/` | qpdf 11 (WebAssembly, `@neslinesli93/qpdf-wasm` 0.3.0) in a Web Worker: AES-256 (default) or AES-128, optional print/copy/edit/comment restrictions with an owner password; output reopened with pdf.js to prove the password is required |
+| Unlock PDF | `/unlock-pdf/` | qpdf `--show-encryption` inspection → `--decrypt` with the user-supplied password only (no guessing); opening-password-only unlocks keep the author's restrictions; RC4/AES-128/AES-256 |
+| Watermark PDF | `/watermark-pdf/` | `pdf-stamp.ts` placement (9 positions, diagonal, custom drag, tiling, page scopes) → `pdf-overlay.ts` export with opacity ExtGState; text or transparent PNG/JPG logo embedded once |
+| Add Page Numbers | `/add-page-numbers/` | `pdf-stamp.ts` numbering plan (skip N, start at, ranges, 1/01/Page n/Page n of N/n/N/Roman) + header/footer text with `{page}` `{total}` `{title}` `{date}` `{file}`; rotation and crop-box safe |
+| PDF to PowerPoint | `/pdf-to-powerpoint/` | pptxgenjs 4.0.1: "Keep the layout" (pdf.js render per slide) or "Editable text" (`pdf-layout.ts` paragraphs/tables → text boxes over a text-free background); scanned pages → picture slides with OCR text in the notes |
 | EMI Calculator | `/emi-calculator/` (was `/loan-emi-calculator/`, 308) | Reducing-balance EMI in integer minor units, amortization, prepayment, comparison, CSV/print, multi-currency |
 
-No file, text, number or password is ever sent to a server.
+No file, text, number or password is ever sent to a server. PDF passwords are used once inside a qpdf worker, filtered out of its output, never logged or sent to analytics, and cleared from the form after success.
 
 pdf.js (thumbnails) is served from `/public/pdfjs`, copied from `node_modules` by `scripts/copy-pdfjs.mjs` on install/dev/build — keeps the CSP `self`-only.
+The OCR worker, WebAssembly cores and language models (`/public/ocr`) and the AVIF codec and qpdf wasm (`/public/wasm`) are copied by `scripts/copy-wasm.mjs` the same way — no CDN. The CSP allows `'wasm-unsafe-eval'` (WebAssembly compilation only, not `eval`).
+Word to PDF uses the browser's own print dialog ("Save as PDF") because no browser library reproduces Word layout reliably and there is deliberately no server.
 
 ### Shared building blocks
 - `src/components/tools/useBatch.ts` — sequential, claim-safe multi-file queue with object-URL cleanup
 - `src/components/tools/SortableList.tsx` — drag handle + keyboard move up/down
 - `src/components/tools/Editor.tsx` — text/code editor with toolbar, counts, line gutter and error-line highlight
+- `src/components/tools/pdf/` — `usePdfFile`, `PdfThumbs` (lazy serial thumbnails), `PdfPageCanvas`, `OverlayLayer` (select/move/resize/rotate) shared by the PDF tools; `src/lib/use-history.ts` (undo/redo with gesture commits)
+- `src/lib/pdf-overlay.ts` + `src/lib/pdf-text.ts` — overlay export and font handling (standard fonts → Noto Sans → canvas image for complex scripts)
 - `src/components/tools/SocialPreviews.tsx` + `TagOutput.tsx` — shared link-card simulations and tabbed tag output (Meta Tag Generator, Open Graph Preview)
 - `src/components/tools/CodeFormatter.tsx` — shared beautify/minify shell (input/output editors, file open, size comparison, issues list)
 - `src/components/tools/ui.tsx` — DropZone, Segmented, Toggle, Range, Notice, ProgressBar, CopyButton, RejectionNotice, Metric, DownloadButton
@@ -67,14 +86,14 @@ npm run dev
 ## Verify
 ```bash
 npm run typecheck && npm run lint
-npm run test:unit                       # 576 assertions across every calculation and conversion engine
+npm run test:unit                       # 718 assertions across every calculation and conversion engine
 npm run build && npm start -- -p 3100   # in another terminal:
 NEXT_PUBLIC_GTM_ID= npm run build      # build WITHOUT analytics so tests don't send hits to GA
-npm run test:e2e                        # 664 browser checks against real outputs (Playwright)
+npm run test:e2e                        # 939 browser checks against real outputs (Playwright)
 npm run test:links                      # internal links + anchors
 node tests/screens.mjs ./shots          # screenshots at 1440/1280/768/390/360 + overflow check
 ```
-Fixtures live in `tests/fixtures/` (`npm run test:fixtures` regenerates the PDFs).
+Fixtures live in `tests/fixtures/` (`npm run test:fixtures` regenerates the PDFs, DOCX and image fixtures; HEIC/AVIF fixtures were made with macOS `sips`; `make-sheet-fixtures.mjs` builds the table PDFs and Excel workbooks). Encrypted fixtures (`locked-*.pdf`) are written by `tests/tools-10.test.mts`. OCR and scanned-PDF fixtures are generated during `tests/e2e-9.mts`.
 
 ## Adding a tool
 1. Add an entry to `src/lib/tools.ts` (content, SEO, FAQs, specs, related tools).

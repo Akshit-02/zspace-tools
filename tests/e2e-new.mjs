@@ -117,8 +117,8 @@ const numbered = (n) => 300 + 5 * (n - 1);
   await page.getByText("20 pages", { exact: false }).first().waitFor({ timeout: 30000 });
   await page.getByText(/4 pages ·/).waitFor({ timeout: 30000 });
   check("merger: page counts and sizes shown", true);
-  check("merger: encrypted PDF flagged", await page.getByText(/encrypted.pdf" is password-protected/).isVisible());
-  check("merger: invalid PDF flagged", await page.getByText(/fake.pdf" isn't a PDF/).isVisible());
+  check("merger: encrypted PDF flagged", await page.getByText(/encrypted.pdf" is password-protected/).waitFor({ timeout: 15000 }).then(() => true, () => false));
+  check("merger: invalid PDF flagged", await page.getByText(/fake.pdf" isn't a PDF/).waitFor({ timeout: 15000 }).then(() => true, () => false));
   await page.waitForFunction(() => document.querySelectorAll("ol[aria-label='PDF files in merge order'] img").length >= 2, null, { timeout: 30000 }).catch(() => {});
   check("merger: first-page thumbnails rendered (pdf.js)", (await page.locator("ol[aria-label='PDF files in merge order'] img").count()) >= 2);
 

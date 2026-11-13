@@ -43,3 +43,5 @@ next-env.d.ts
 
 # generated pdf.js runtime assets
 /public/pdfjs
+/public/ocr
+/public/wasm

@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated vendor assets (pdf.js worker), copied by scripts/copy-pdfjs.mjs
     "public/pdfjs/**",
+    // OCR engine, language data and AVIF codec, copied by scripts/copy-wasm.mjs
+    "public/ocr/**",
+    "public/wasm/**",
   ]),
 ]);
 

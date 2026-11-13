@@ -41,6 +41,21 @@ const components: Record<string, React.ComponentType> = {
   "robots-txt-generator": dynamic(() => import("./RobotsTxtGenerator"), { loading: () => <ToolSkeleton /> }),
   "open-graph-preview": dynamic(() => import("./OpenGraphPreview"), { loading: () => <ToolSkeleton /> }),
   "html-entity-encoder": dynamic(() => import("./HtmlEntityEncoder"), { loading: () => <ToolSkeleton /> }),
+  "pdf-to-word": dynamic(() => import("./PdfToWord"), { loading: () => <ToolSkeleton /> }),
+  "word-to-pdf": dynamic(() => import("./WordToPdf"), { loading: () => <ToolSkeleton /> }),
+  "pdf-to-jpg": dynamic(() => import("./PdfToImage"), { loading: () => <ToolSkeleton /> }),
+  "image-converter": dynamic(() => import("./ImageConverter"), { loading: () => <ToolSkeleton /> }),
+  "image-to-text": dynamic(() => import("./ImageToText"), { loading: () => <ToolSkeleton /> }),
+  "pdf-to-excel": dynamic(() => import("./PdfToExcel"), { loading: () => <ToolSkeleton /> }),
+  "excel-to-pdf": dynamic(() => import("./ExcelToPdf"), { loading: () => <ToolSkeleton /> }),
+  "pdf-editor": dynamic(() => import("./PdfEditor"), { loading: () => <ToolSkeleton /> }),
+  "pdf-organizer": dynamic(() => import("./PdfOrganizer"), { loading: () => <ToolSkeleton /> }),
+  "sign-pdf": dynamic(() => import("./SignPdf"), { loading: () => <ToolSkeleton /> }),
+  "protect-pdf": dynamic(() => import("./ProtectPdf"), { loading: () => <ToolSkeleton /> }),
+  "unlock-pdf": dynamic(() => import("./UnlockPdf"), { loading: () => <ToolSkeleton /> }),
+  "watermark-pdf": dynamic(() => import("./WatermarkPdf"), { loading: () => <ToolSkeleton /> }),
+  "add-page-numbers": dynamic(() => import("./AddPageNumbers"), { loading: () => <ToolSkeleton /> }),
+  "pdf-to-powerpoint": dynamic(() => import("./PdfToPowerpoint"), { loading: () => <ToolSkeleton /> }),
 };
 
 export function ToolRenderer({ slug }: { slug: string }) {

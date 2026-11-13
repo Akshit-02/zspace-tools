@@ -24,6 +24,8 @@ export function searchTools(query: string, limit = 8): SearchHit[] {
       { text: norm(tool.formats.join(" ")), w: 4 },
     ];
     let score = name.startsWith(q) ? 25 : name.includes(q) ? 15 : 0;
+    // Whole-phrase match on a curated search term ("heic to jpg", "docx to pdf") beats scattered word matches.
+    if (q.includes(" ") && [...tool.searchTerms, tool.seo.keyword, ...tool.seo.secondary].some((t) => norm(t).includes(q))) score += 12;
     let matched = 0;
     for (const term of terms) {
       let best = 0;

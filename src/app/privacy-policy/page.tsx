@@ -38,6 +38,11 @@ export default function PrivacyPage() {
           in your browser. Pasted text, URLs, JSON, CSV, HTML and CSS, regex patterns and test text — including any keys or personal data inside them — are not transmitted or saved.
         </li>
         <li>
+          <strong>PDF to Word, Word to PDF, PDF to Excel, Excel to PDF, PDF to JPG &amp; PNG, Image Converter, Image to Text (OCR), PDF Editor, PDF Page Organizer, Sign PDF, Protect PDF, Unlock PDF, Watermark PDF, Add Page Numbers and PDF to PowerPoint</strong> convert your documents and images in your
+          browser. Files are never uploaded. The OCR engine, its language data and the HEIC/AVIF image decoders are downloaded from this website (not a third
+          party) only when you use them, and your browser may cache them. Word to PDF uses your browser&apos;s own print dialog to save the PDF. Signatures you draw, type or upload in Sign PDF are kept only in your browser&apos;s memory while the page is open — they are never uploaded or stored. Passwords you enter in Protect PDF or Unlock PDF are used once inside your browser to encrypt or decrypt the file and are then cleared — they are never uploaded, stored, logged or included in analytics.
+        </li>
+        <li>
           <strong>Meta Tag Generator, XML Sitemap Generator, Robots.txt Generator, Open Graph Preview and HTML Entity Encoder</strong> build their output in your
           browser. They don&apos;t crawl or fetch websites and don&apos;t submit anything to search engines. When you enter an image URL in the Meta Tag Generator or
           Open Graph Preview, your browser loads that image directly from its own server to show the preview — that server sees an ordinary image request from
