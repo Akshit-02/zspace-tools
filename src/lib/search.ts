@@ -7,6 +7,9 @@ export interface SearchHit {
 
 const norm = (s: string) => s.toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, " ");
 
+/** Very short terms ("amp", "og", "kb") only match at the start of a word, so "amp" doesn't hit "stamp". */
+const has = (text: string, term: string) => (term.length > 3 ? text.includes(term) : (" " + text.replace(/-/g, " ")).includes(" " + term));
+
 /** Lightweight weighted search over the tool registry. Runs client-side, instantly. */
 export function searchTools(query: string, limit = 8): SearchHit[] {
   const q = norm(query).trim();
@@ -23,14 +26,14 @@ export function searchTools(query: string, limit = 8): SearchHit[] {
       { text: norm(tool.short), w: 2 },
       { text: norm(tool.formats.join(" ")), w: 4 },
     ];
-    let score = name.startsWith(q) ? 25 : name.includes(q) ? 15 : 0;
+    let score = name.startsWith(q) ? 25 : has(name, q) ? 15 : 0;
     // Whole-phrase match on a curated search term ("heic to jpg", "docx to pdf") beats scattered word matches.
     if (q.includes(" ") && [...tool.searchTerms, tool.seo.keyword, ...tool.seo.secondary].some((t) => norm(t).includes(q))) score += 12;
     let matched = 0;
     for (const term of terms) {
       let best = 0;
       for (const f of fields) {
-        if (f.text.includes(term)) best = Math.max(best, f.w);
+        if (has(f.text, term)) best = Math.max(best, f.w);
         else if (term.length > 3 && f.text.includes(term.slice(0, -1))) best = Math.max(best, f.w * 0.6);
       }
       if (best > 0) matched++;
