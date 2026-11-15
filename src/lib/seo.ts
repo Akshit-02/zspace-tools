@@ -115,7 +115,7 @@ export function toolAppLd(tool: Tool) {
     name: tool.name,
     url: absoluteUrl(`/${tool.slug}/`),
     description: tool.what,
-    applicationCategory: tool.category === "image" ? "MultimediaApplication" : "UtilitiesApplication",
+    applicationCategory: tool.category === "image" ? "MultimediaApplication" : tool.category === "health" ? "HealthApplication" : tool.category === "education" ? "EducationalApplication" : "UtilitiesApplication",
     operatingSystem: "Any (web browser)",
     browserRequirements: "Requires JavaScript and a modern browser.",
     isAccessibleForFree: true,

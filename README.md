@@ -21,11 +21,11 @@
 | Case Converter | `/case-converter/` | 14 styles, style-guide Title Case, Unicode-aware word splitting |
 | URL Encoder & Decoder | `/url-encoder-decoder/` | encodeURI/Component + decode, exact malformed-sequence positions, double-encoding warnings |
 | Base64 Encoder & Decoder | `/base64-encoder-decoder/` | UTF-8 via TextEncoder, strict validation, URL-safe/MIME, chunked file mode with type sniffing |
-| CSV to JSON Converter | `/csv-to-json/` | Papa Parse 5.7.0 (pinned) + own header/ragged-row handling; nothing silently dropped |
+| CSV ↔ JSON Converter | `/csv-to-json/` (`/csv-json-converter/` and `/json-to-csv/` redirect, 308) | CSV → JSON: Papa Parse 5.7.0 (pinned) + own header/ragged-row handling. JSON → CSV: `json-csv.ts` (dot-path flattening, indexed or JSON-text arrays, union of keys, formula-injection warning + opt-in guard, BOM/CRLF) via shared `csv-write.ts`; nothing silently dropped |
 | Days Between Dates | `/days-between-dates/` (was `/date-calculator/`, 308) | Difference (incl./excl., hours/minutes), add/subtract with month-end clamping, business days (Mon–Fri, Mon–Sat, custom, holidays), countdown, validated share links |
 | Color Picker & Converter | `/color-picker/` | HEX (3/4/6/8-digit)/RGB(A)/HSL(A), HSL + alpha sliders, 6 palette harmonies + preview, tints & shades, CSS snippets & custom properties, WCAG contrast, validated ?c= share links |
 | UUID Generator | `/uuid-generator/` | crypto.randomUUID v4 + RFC 9562 v7 (monotonic), bulk 1,000, validator |
-| Markdown Editor & Previewer | `/markdown-editor/` | marked 18.1.2 + DOMPurify 3.4.17, URL allow-list, undo-safe toolbar, .md/.html export |
+| Online Markdown Editor | `/markdown-editor/` | marked 18.1.2 + DOMPurify 3.4.17, URL allow-list, undo-safe toolbar, heading anchors + table of contents (set via DOM after sanitising), debounced preview for large docs, .md/.html export |
 | Invoice Generator | `/invoice-generator/` | Integer-minor-unit totals, GST/VAT, 3 templates, vector A4 PDF via pdf-lib + fontkit (Satoshi + Noto Sans fallback) |
 | URL Slug Generator | `/url-slug-generator/` | Script-aware transliteration (Latin, Greek, RU/UK Cyrillic), Unicode keep/remove, stop words, word-boundary max length, bulk + CSV |
 | Image Cropper | `/image-cropper/` | Pointer/keyboard crop box, ratio lock, rotate/flip/zoom, exact preset output sizes |
@@ -50,9 +50,48 @@
 | Sign PDF | `/sign-pdf/` | Draw (smoothed canvas), type (self-hosted OFL script fonts), upload (white removal + trim) → overlay placement with rotate/resize, date/name, copy to all pages; visual signature only |
 | Protect PDF | `/protect-pdf/` | qpdf 11 (WebAssembly, `@neslinesli93/qpdf-wasm` 0.3.0) in a Web Worker: AES-256 (default) or AES-128, optional print/copy/edit/comment restrictions with an owner password; output reopened with pdf.js to prove the password is required |
 | Unlock PDF | `/unlock-pdf/` | qpdf `--show-encryption` inspection → `--decrypt` with the user-supplied password only (no guessing); opening-password-only unlocks keep the author's restrictions; RC4/AES-128/AES-256 |
-| Watermark PDF | `/watermark-pdf/` | `pdf-stamp.ts` placement (9 positions, diagonal, custom drag, tiling, page scopes) → `pdf-overlay.ts` export with opacity ExtGState; text or transparent PNG/JPG logo embedded once |
-| Add Page Numbers | `/add-page-numbers/` | `pdf-stamp.ts` numbering plan (skip N, start at, ranges, 1/01/Page n/Page n of N/n/N/Roman) + header/footer text with `{page}` `{total}` `{title}` `{date}` `{file}`; rotation and crop-box safe |
+| Add Watermark to PDF | `/watermark-pdf/` (`/add-watermark-to-pdf/` redirects, 308) | `pdf-stamp.ts` placement (9 positions, diagonal, custom drag, tiling, page scopes) → `pdf-overlay.ts` export with opacity ExtGState; text or transparent PNG/JPG logo embedded once |
+| Add Page Numbers | `/add-page-numbers/` (`/add-page-numbers-to-pdf/` redirects, 308) | `pdf-stamp.ts` numbering plan (skip N, start at, ranges, 1/01/Page n/Page n of N/n/N/Roman) + header/footer text with `{page}` `{total}` `{title}` `{date}` `{file}`; rotation and crop-box safe |
 | PDF to PowerPoint | `/pdf-to-powerpoint/` | pptxgenjs 4.0.1: "Keep the layout" (pdf.js render per slide) or "Editable text" (`pdf-layout.ts` paragraphs/tables → text boxes over a text-free background); scanned pages → picture slides with OCR text in the notes |
+| Rotate PDF Pages | `/rotate-pdf/` | Per-page added turn (relative to the opened file, so never applied twice) → pdf-lib sets `/Rotate` on the original document in place (order, links, forms, bookmarks, metadata kept); all/selected/odd/even/landscape/portrait; output re-opened to verify |
+| SIP Calculator | `/sip-calculator/` | `sip.ts`: effective (1+R)^(1/12)−1 or nominal R÷12 monthly rate, start/end timing, month-by-month step-up, closed-form cross-check, scenario compare, CSV |
+| Compound Interest | `/compound-interest-calculator/` | `compound.ts`: P(1+r/m)^(mt) with fractional t, each contribution grown from its own date, simple-interest comparison, year-wise rows that reconcile, CSV |
+| BMI Calculator | `/bmi-calculator/` | `bmi.ts`: kg/m², exact imperial conversion, category from the displayed 1-dp value, healthy-weight range; adults only |
+| GPA & CGPA | `/gpa-cgpa-calculator/` | `gpa.ts`: credit-weighted GPA/CGPA, 10/4/5/custom scales, repeated-subject policy, user-chosen % formula, decimal-safe display rounding |
+| Tip & Bill Split | `/tip-calculator/` | `tip.ts`: integer minor units, tax added/included/amount, tip before/after tax, exact/up/nearest splits that reconcile |
+| FD Calculator | `/fd-calculator/` | `fd.ts`: cumulative P(1+r/m)^(mt); payout P·r/f with pro-rata part-period; senior-citizen extra; optional user-rate tax estimate |
+| RD Calculator | `/rd-calculator/` | `rd.ts`: month-by-month accrual at r/12, credited quarterly (or monthly approximation), start/end timing, IRR yield, FD comparison |
+| Lumpsum Calculator | `/lumpsum-calculator/` | `lumpsum.ts`: P(1+r/m)^(mt), inflation-adjusted value, two-scenario comparison on identical duration |
+| ROI Calculator | `/roi-calculator/` | `roi.ts`: received-vs-net-profit entry, expenses, annualised only for single cash flows (XIRR note otherwise), up to 3 projects |
+| CAGR Calculator | `/cagr-calculator/` | `cagr.ts`: CAGR / end value / start value, years + months, smooth growth path |
+| XIRR Calculator | `/xirr-calculator/` | `xirr.ts`: Excel days÷365; full-range NPV sign scan + bisection (no guess), multiple/no roots reported; paste import; benchmark gap |
+| SWP Calculator | `/swp-calculator/` | `swp.ts`: effective-annual → periodic rate, start/end timing, step-up or inflation-linked, never-negative balance, 3 scenarios |
+| PPF Calculator | `/ppf-calculator/` | `ppf.ts` + `india/ppf-rules.ts` (sources, last verified): monthly lowest balance after the 5th, 31-March credit, 15 FYs after opening year, extension with/without deposits |
+| Inflation Calculator | `/inflation-calculator/` | `inflation.ts`: future cost, present value, between years, purchasing power, 3 scenarios |
+| Retirement Calculator | `/retirement-calculator/` | `retirement.ts`: monthly model — inflated expenses, PV at post-retirement return, projected corpus with step-up, gap → extra monthly SIP, drawdown age |
+| Income Tax Calculator | `/income-tax-calculator/` | `india/income-tax.ts`: new vs old regime, slabs, rebate + marginal relief, surcharge + marginal relief, cess, ₹10 rounding; years from `india/rules.ts` |
+| Take-Home Salary Calculator | `/take-home-salary-calculator/` | `india/salary.ts` `splitCtc` + `takeHome`: CTC → components, employer PF/NPS/gratuity once, employee PF/ESI/PT, tax via the income-tax engine |
+| HRA Calculator | `/hra-calculator/` | `india/payroll.ts` `hraExemption`: least of three limits, month-wise; 8 × 50% cities from 2026-27 |
+| TDS Calculator | `/tds-calculator/` | `india/salary.ts` `tdsOnPayment`: yearly/monthly/per-payment thresholds, no-PAN rate, 194x / 393 sections |
+| EPF Calculator | `/epf-calculator/` | `india/payroll.ts` `projectEpf`: EPF/EPS split, ceiling vs actual, VPF, monthly running balance, yearly credit |
+| ESI Calculator | `/esi-calculator/` | `india/payroll.ts` `esiMonth`/`esiPeriod`: 0.75% / 3.25%, rounded up, coverage by contribution period |
+| Gratuity Calculator | `/gratuity-calculator/` | `india/payroll.ts` `gratuity` + `codeWages`: 15/26, eligibility, part-year rounding, ₹20L cap, 50% wage rule, tax exemption |
+| NPS Calculator | `/nps-calculator/` | `india/salary.ts` `projectNps`: step-up projection, Dec-2025 PFRDA exit rules, annuity pension |
+| Salary Hike Calculator | `/salary-hike-calculator/` | `india/salary.ts`: hike %, new salary, real hike after inflation |
+| Leave Encashment Calculator | `/leave-encashment-calculator/` | `india/payroll.ts` `leaveEncashment`: amount, four-limit exemption (₹25L), govt / in-service rules |
+| Home Loan Eligibility Calculator | `/home-loan-eligibility-calculator/` | `loans/borrowing.ts` `homeLoanEligibility`: FOIR → EMI room → PV, capped by RBI LTV (`loans/ltv-rules.ts`) and down payment |
+| Home Loan Prepayment Calculator | `/home-loan-prepayment-calculator/` | `loans/amortise.ts` `amortise`: paise amortisation, one-time/recurring prepayments, before/after EMI, cut tenure/EMI, fees, scenarios |
+| Car Loan Calculator | `/car-loan-calculator/` | on-road build-up + `amortise` + `loanCost` (fees, GST) |
+| Personal Loan Calculator | `/personal-loan-calculator/` | `loanCost`: net disbursal, fees + GST, effective annual rate via monthly IRR |
+| Loan Affordability Calculator | `/loan-affordability-calculator/` | `affordability`: surplus-capped EMI for three editable scenarios |
+| Rent vs Buy Calculator | `/rent-vs-buy-calculator/` | `loans/property.ts` `rentVsBuy`: same-cash monthly model, net worth by year, break-even |
+| Stamp Duty Calculator | `/stamp-duty-calculator/` | `loans/property-rules.ts` `stampDuty`: state/area/buyer/date rules with sources; unsupported → manual |
+| Property Registration Charges Calculator | `/property-registration-charges-calculator/` | `registrationFee`: %, slabs, caps, concessions, fixed charges |
+| Down Payment Calculator | `/down-payment-calculator/` | `downPayment`: LTV-raised down payment, charges, savings gap, EMI |
+| Debt-to-Income Ratio Calculator | `/debt-to-income-ratio-calculator/` | `dti`: back-end, front-end, net ratio, proposed loan, headroom |
+| Number to Words | `/number-to-words/` | String-decimal parsing (no floats), Indian (lakh/crore) + international scales to 15 digits, 8 currencies + custom, half-up rounding always reported, bulk + CSV |
+| Text Diff Checker | `/text-diff-checker/` | Own linear-space Myers O(ND) (`text-diff.ts`, deadline fallback) in a Web Worker; line → word (Intl.Segmenter) / grapheme inline diff; ignore case/whitespace/blank lines/EOL via comparison keys only; unified diff export |
+| File Hash Generator | `/file-hash-generator/` | Web Crypto ≤ 64 MB; larger files (≤ 4 GB) streamed in 4 MB chunks through incremental SHA-1/256/384/512 (`hash.ts`, verified against OpenSSL) in a Web Worker; GNU/BSD checksum-list verification |
 | EMI Calculator | `/emi-calculator/` (was `/loan-emi-calculator/`, 308) | Reducing-balance EMI in integer minor units, amortization, prepayment, comparison, CSV/print, multi-currency |
 
 No file, text, number or password is ever sent to a server. PDF passwords are used once inside a qpdf worker, filtered out of its output, never logged or sent to analytics, and cleared from the form after success.
@@ -69,6 +108,7 @@ Word to PDF uses the browser's own print dialog ("Save as PDF") because no brows
 - `src/lib/pdf-overlay.ts` + `src/lib/pdf-text.ts` — overlay export and font handling (standard fonts → Noto Sans → canvas image for complex scripts)
 - `src/components/tools/SocialPreviews.tsx` + `TagOutput.tsx` — shared link-card simulations and tabbed tag output (Meta Tag Generator, Open Graph Preview)
 - `src/components/tools/CodeFormatter.tsx` — shared beautify/minify shell (input/output editors, file open, size comparison, issues list)
+- `src/components/tools/charts.tsx` (dependency-free SVG donut/bar/line charts) and `calc-ui.tsx` (NumberField, Chips, Figure, Formula) — shared by the calculators
 - `src/components/tools/ui.tsx` — DropZone, Segmented, Toggle, Range, Notice, ProgressBar, CopyButton, RejectionNotice, Metric, DownloadButton
 - `src/lib/image-utils.ts`, `src/lib/pdf-utils.ts`, `src/lib/pdf-render.ts`, `src/lib/files.ts`, `src/lib/zip.ts`
 
@@ -113,3 +153,11 @@ Any Node host or Vercel: `npm run build && npm start`. Set `NEXT_PUBLIC_SITE_URL
 ## Fonts in generated PDFs
 `public/fonts/pdf/` holds Satoshi (ITF FFL — embedding in documents permitted) and Noto Sans (SIL OFL, licence alongside).
 Invoices embed subsets only. Complex scripts (Devanagari, Arabic) can't be shaped by pdf-lib, so the tool detects them and recommends Print → Save as PDF.
+
+### Indian salary, tax and payroll rules
+
+All statutory values for the salary/tax tools live in `src/lib/india/rules.ts`, versioned by year with sources, effective dates, `LAST_VERIFIED` and a per-rule status (`verified`, `secondary`, `carried`). Update that file — never a component — when rules change, and add a new `TaxYearId` rather than editing a past year.
+
+### Loan and property rules
+
+Loan maths lives in `src/lib/loans/` (built on `src/lib/emi.ts`). Statutory property charges are in `src/lib/loans/property-rules.ts`: each state/area rule has an effective date, sources and a status, and a state is calculated only when its base rate was verified on an official source — everything else shows an "unsupported, enter the rate" state. RBI LTV limits are in `src/lib/loans/ltv-rules.ts`.

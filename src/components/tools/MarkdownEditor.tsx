@@ -1,15 +1,17 @@
 "use client";
 
 import { useDeferredValue, useEffect, useRef, useState } from "react";
-import { Bold, Code, Download, Eraser, FileCode2, Heading2, Image as ImageIcon, Italic, Link2, List, ListChecks, ListOrdered, Minus, Quote, Sparkles, Strikethrough, Table } from "lucide-react";
+import { Bold, Code, Download, Eraser, FileCode2, Heading2, Image as ImageIcon, Italic, Link2, List, ListChecks, ListOrdered, ListTree, Minus, Quote, Sparkles, Strikethrough, Table, Trash2 } from "lucide-react";
 import { clsx } from "clsx";
 import { CopyButton, Segmented, Toggle } from "./ui";
-import { MARKDOWN_SAMPLE, exportHtml, markdownStats, renderMarkdown } from "@/lib/markdown";
+import { MARKDOWN_SAMPLE, addHeadingAnchors, exportHtml, markdownStats, renderMarkdown, tocHtml, type TocEntry } from "@/lib/markdown";
 import { downloadBlob } from "@/lib/format";
 import { track } from "@/lib/analytics";
 
 const DRAFT_KEY = "zs-markdown-draft";
 const DRAFT_ON = "zs-markdown-draft-on";
+/** Above this size the preview waits for a short pause in typing instead of re-rendering on every keystroke. */
+const DEBOUNCE_FROM = 50_000;
 const safeGet = (k: string) => {
   try {
     return localStorage.getItem(k);
@@ -48,8 +50,18 @@ export default function MarkdownEditor() {
   const [html, setHtml] = useState("");
   const [view, setView] = useState<"edit" | "preview">("edit");
   const [keepDraft, setKeepDraft] = useState(false);
+  const [showToc, setShowToc] = useState(false);
+  const [toc, setToc] = useState<TocEntry[]>([]);
   const area = useRef<HTMLTextAreaElement>(null);
-  const deferred = useDeferredValue(text);
+  const preview = useRef<HTMLElement>(null);
+  const deferredNow = useDeferredValue(text);
+  const [debounced, setDebounced] = useState(text);
+  useEffect(() => {
+    if (deferredNow.length < DEBOUNCE_FROM) return;
+    const t = setTimeout(() => setDebounced(deferredNow), 300);
+    return () => clearTimeout(t);
+  }, [deferredNow]);
+  const deferred = deferredNow.length < DEBOUNCE_FROM ? deferredNow : debounced;
   const stats = markdownStats(deferred);
 
   useEffect(() => {
@@ -62,11 +74,21 @@ export default function MarkdownEditor() {
 
   useEffect(() => {
     let alive = true;
-    renderMarkdown(deferred).then((h) => alive && setHtml(h));
+    renderMarkdown(deferred).then((h) => {
+      if (!alive) return;
+      if (showToc) {
+        const r = addHeadingAnchors(h);
+        setHtml(r.html);
+        setToc(r.toc);
+      } else {
+        setHtml(h);
+        setToc([]);
+      }
+    });
     return () => {
       alive = false;
     };
-  }, [deferred]);
+  }, [deferred, showToc]);
 
   useEffect(() => {
     if (keepDraft) safeSet(DRAFT_KEY, deferred);
@@ -184,7 +206,7 @@ export default function MarkdownEditor() {
           value={view}
           onChange={(v) => setView(v as "edit" | "preview")}
           options={[
-            { value: "edit", label: "Edit" },
+            { value: "edit", label: "Write" },
             { value: "preview", label: "Preview" },
           ]}
         />
@@ -226,16 +248,31 @@ export default function MarkdownEditor() {
             <p className="font-mono text-xs text-ink-2" aria-live="polite">
               {stats.words.toLocaleString("en-US")} words · {stats.characters.toLocaleString("en-US")} chars · {stats.minutes} min read
             </p>
-            <Toggle
-              checked={keepDraft}
-              onChange={(v) => {
-                setKeepDraft(v);
-                safeSet(DRAFT_ON, v ? "1" : null);
-                safeSet(DRAFT_KEY, v ? text : null);
-              }}
-              label="Keep draft in this browser"
-              description={keepDraft ? "Saved on this device only · switch off to delete it" : "Off — nothing is saved"}
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <Toggle
+                checked={keepDraft}
+                onChange={(v) => {
+                  setKeepDraft(v);
+                  safeSet(DRAFT_ON, v ? "1" : null);
+                  safeSet(DRAFT_KEY, v ? text : null);
+                }}
+                label="Keep draft in this browser"
+                description={keepDraft ? "Saved in this browser's local storage only" : "Off — nothing is saved"}
+              />
+              {keepDraft && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setKeepDraft(false);
+                    safeSet(DRAFT_ON, null);
+                    safeSet(DRAFT_KEY, null);
+                  }}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-[10px] px-2.5 text-sm text-ink-2 hover:bg-ivory-2 hover:text-charcoal"
+                >
+                  <Trash2 aria-hidden className="size-3.5" /> Delete saved draft
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -243,11 +280,45 @@ export default function MarkdownEditor() {
           <div className="flex min-h-[48px] flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-1.5">
             <p className="text-sm font-bold">Preview</p>
             <div className="flex flex-wrap gap-1">
+              <button
+                type="button"
+                aria-pressed={showToc}
+                onClick={() => setShowToc((v) => !v)}
+                className={clsx("inline-flex h-8 items-center gap-1.5 rounded-[8px] px-2.5 text-[0.84rem] transition-colors", showToc ? "bg-charcoal text-ivory" : "text-ink-2 hover:bg-ivory-2 hover:text-charcoal")}
+              >
+                <ListTree aria-hidden className="size-3.5" /> Contents
+              </button>
               <CopyButton text={() => text} label="Copy Markdown" className="!h-8" onCopied={() => track("copy_clicked", { tool: "markdown-editor", format: "md" })} />
               <CopyButton text={() => html} label="Copy HTML" className="!h-8" onCopied={() => track("copy_clicked", { tool: "markdown-editor", format: "html" })} />
             </div>
           </div>
-          <article className="md-preview min-h-[520px] flex-1 overflow-auto px-5 py-4 sm:px-7" data-testid="md-preview" dangerouslySetInnerHTML={{ __html: html || '<p class="md-empty">Your formatted preview appears here.</p>' }} />
+          {showToc && (
+            <nav aria-label="Table of contents" data-testid="md-toc" className="border-b border-line bg-ivory px-5 py-3 sm:px-7">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-ink-2">Contents</p>
+              {toc.length ? (
+                <ul className="mt-2 space-y-1 text-sm">
+                  {toc.map((t) => (
+                    <li key={t.id} style={{ paddingLeft: `${(t.level - Math.min(...toc.map((x) => x.level))) * 0.9}rem` }}>
+                      <a
+                        href={`#${t.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          preview.current?.querySelector(`#${CSS.escape(t.id)}`)?.scrollIntoView({ block: "start", behavior: "smooth" });
+                        }}
+                        className="text-charcoal underline decoration-line-strong underline-offset-2 hover:decoration-orange"
+                      >
+                        {t.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-1 text-sm text-ink-2">Add headings (# Title, ## Section) to build a table of contents.</p>
+              )}
+            </nav>
+          )}
+          {/* `html` is produced by renderMarkdown(): marked with raw HTML escaped, then DOMPurify with a URL allow-list. */}
+          <article ref={preview} className="md-preview min-h-[520px] flex-1 overflow-auto px-5 py-4 sm:px-7" data-testid="md-preview" dangerouslySetInnerHTML={{ __html: html || '<p class="md-empty">Your formatted preview appears here.</p>' }} />
           <div className="flex flex-wrap gap-2 border-t border-line px-3 py-2">
             <button
               type="button"
@@ -263,7 +334,7 @@ export default function MarkdownEditor() {
             <button
               type="button"
               onClick={() => {
-                downloadBlob(new Blob([exportHtml(html, title)], { type: "text/html;charset=utf-8" }), `${title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "document"}.html`);
+                downloadBlob(new Blob([exportHtml(showToc ? tocHtml(toc) + html : html, title)], { type: "text/html;charset=utf-8" }), `${title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "document"}.html`);
                 track("download_clicked", { tool: "markdown-editor", format: "html" });
               }}
               disabled={!text}

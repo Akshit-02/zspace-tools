@@ -10,13 +10,15 @@ import { hexToRgb01, needsShaping, textToPng, wrap } from "./pdf-text";
 
 export const PAPERS = { A4: [595.28, 841.89], A3: [841.89, 1190.55], Letter: [612, 792], Legal: [612, 1008] } as const;
 export type Paper = keyof typeof PAPERS;
-export type Fit = "actual" | "width" | "page";
+export type Fit = "actual" | "width" | "page" | "custom";
 
 export interface PdfOptions {
   paper: Paper;
   orientation: "portrait" | "landscape" | "auto";
   margin: number; // pt, all sides
   fit: Fit;
+  /** Used when fit is "custom": print scale in percent (10–400), like Excel's "Adjust to". */
+  scalePct?: number;
   repeatRows: number | "auto";
   pageNumbers: boolean;
   gridlines: boolean;
@@ -95,7 +97,7 @@ export function layout(wbm: WorkbookModel, o: PdfOptions): Layout[] {
     const footer = o.pageNumbers ? 20 : 0;
     const availW = pageW - 2 * o.margin;
     const availH = pageH - 2 * o.margin - footer;
-    const scale = o.fit === "actual" ? 1 : o.fit === "width" ? Math.min(1, availW / totalW) : Math.min(1, availW / totalW, availH / totalH);
+    const scale = o.fit === "custom" ? Math.min(4, Math.max(0.1, (o.scalePct ?? 100) / 100)) : o.fit === "actual" ? 1 : o.fit === "width" ? Math.min(1, availW / totalW) : Math.min(1, availW / totalW, availH / totalH);
     const repeat = o.repeatRows === "auto" ? s.titleRows : o.repeatRows;
     const repeatN = rows.filter((r) => r <= repeat).length;
     const colBands = bands(cols.map((c) => s.colW[c] * scale), availW);

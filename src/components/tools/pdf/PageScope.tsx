@@ -5,6 +5,7 @@ import type { Scope } from "@/lib/pdf-stamp";
 
 const OPTIONS: { value: Scope; label: string }[] = [
   { value: "all", label: "All" },
+  { value: "notFirst", label: "All but 1st" },
   { value: "first", label: "First" },
   { value: "last", label: "Last" },
   { value: "odd", label: "Odd" },
@@ -20,9 +21,9 @@ export function PageScope({ scope, range, onScope, onRange, error, label = "Page
         {label}
         {count !== undefined && !error && <span className="ml-2 font-mono text-xs font-normal text-ink-2">{count} selected</span>}
       </legend>
-      <div role="radiogroup" aria-label={label} className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
+      <div role="radiogroup" aria-label={label} className="grid grid-cols-4 gap-1.5 sm:grid-cols-7">
         {OPTIONS.map((o) => (
-          <button key={o.value} type="button" role="radio" aria-checked={scope === o.value} onClick={() => onScope(o.value)} className={clsx("h-9 rounded-[8px] border text-sm", scope === o.value ? "border-charcoal bg-charcoal text-ivory" : "border-line-strong bg-card hover:border-charcoal")}>
+          <button key={o.value} type="button" role="radio" aria-checked={scope === o.value} onClick={() => onScope(o.value)} className={clsx("h-9 rounded-[8px] border px-1 text-[0.8rem] leading-tight sm:text-sm", scope === o.value ? "border-charcoal bg-charcoal text-ivory" : "border-line-strong bg-card hover:border-charcoal")}>
             {o.label}
           </button>
         ))}

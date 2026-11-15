@@ -80,6 +80,12 @@ const nextConfig: NextConfig = {
       // Renamed tools keep their old URLs working.
       { source: "/loan-emi-calculator", destination: "/emi-calculator/", permanent: true },
       { source: "/date-calculator", destination: "/days-between-dates/", permanent: true },
+      // Alternate names for the CSV ↔ JSON converter (one canonical page).
+      { source: "/csv-json-converter", destination: "/csv-to-json/", permanent: true },
+      { source: "/json-to-csv", destination: "/csv-to-json/?mode=json-to-csv", permanent: true },
+      // Alternate names for existing PDF tools.
+      { source: "/add-page-numbers-to-pdf", destination: "/add-page-numbers/", permanent: true },
+      { source: "/add-watermark-to-pdf", destination: "/watermark-pdf/", permanent: true },
     ];
   },
 };

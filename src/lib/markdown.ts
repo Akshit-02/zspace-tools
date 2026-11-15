@@ -76,6 +76,55 @@ export async function renderMarkdown(src: string): Promise<string> {
   });
 }
 
+export interface TocEntry {
+  level: number;
+  text: string;
+  id: string;
+}
+
+/** "Getting started!" → "getting-started" (letters/numbers from any script are kept). */
+export function headingSlug(text: string) {
+  return (
+    text
+      .normalize("NFKC")
+      .toLowerCase()
+      .replace(/[^\p{L}\p{M}\p{N}\s-]/gu, "")
+      .trim()
+      .replace(/[\s-]+/g, "-") || "section"
+  );
+}
+
+/**
+ * Gives every heading in *already sanitised* HTML a unique "md-…" id and returns
+ * the table of contents. Ids are set through the DOM, never by string
+ * concatenation, and the "md-" prefix keeps them from colliding with the page.
+ * Browser only.
+ */
+export function addHeadingAnchors(sanitisedHtml: string): { html: string; toc: TocEntry[] } {
+  const tpl = document.createElement("template");
+  tpl.innerHTML = sanitisedHtml; // template content is inert: nothing loads or runs
+  const seen = new Map<string, number>();
+  const toc: TocEntry[] = [];
+  tpl.content.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((h) => {
+    const text = (h.textContent ?? "").trim();
+    const base = `md-${headingSlug(text)}`;
+    const n = (seen.get(base) ?? 0) + 1;
+    seen.set(base, n);
+    const id = n === 1 ? base : `${base}-${n}`;
+    h.setAttribute("id", id);
+    toc.push({ level: Number(h.tagName[1]), text: text || "Untitled", id });
+  });
+  return { html: tpl.innerHTML, toc };
+}
+
+/** Escaped HTML for a table of contents, used in the standalone HTML export. */
+export function tocHtml(toc: TocEntry[]) {
+  if (!toc.length) return "";
+  const min = Math.min(...toc.map((t) => t.level));
+  const items = toc.map((t) => `<li style="margin-left:${(t.level - min) * 1.25}em"><a href="#${escapeHtml(t.id)}">${escapeHtml(t.text)}</a></li>`).join("\n");
+  return `<nav aria-label="Table of contents">\n<p><strong>Contents</strong></p>\n<ul style="list-style:none;padding-left:0">\n${items}\n</ul>\n</nav>\n<hr>\n`;
+}
+
 export function exportHtml(bodyHtml: string, title: string) {
   return `<!doctype html>
 <html lang="en">

@@ -28,6 +28,7 @@ export default function ExcelToPdf() {
   const [paper, setPaper] = useState<Paper>("A4");
   const [orientation, setOrientation] = useState<PdfOptions["orientation"]>("auto");
   const [fit, setFit] = useState<Fit>("width");
+  const [scalePct, setScalePct] = useState("100");
   const [margin, setMargin] = useState<keyof typeof MARGINS | "custom">("normal");
   const [customMm, setCustomMm] = useState("15");
   const [repeat, setRepeat] = useState<"auto" | "0" | "1" | "2" | "3">("auto");
@@ -67,7 +68,7 @@ export default function ExcelToPdf() {
   };
 
   const options: PdfOptions | null = wb
-    ? { paper, orientation, fit, margin: margin === "custom" ? Math.max(0, Math.min(100, Number(customMm) || 0)) * 2.8346 : MARGINS[margin], repeatRows: repeat === "auto" ? "auto" : Number(repeat), pageNumbers, gridlines, sheets: [...sheets].sort((a, b) => a - b) }
+    ? { paper, orientation, fit, scalePct: Math.max(10, Math.min(400, Number(scalePct) || 100)), margin: margin === "custom" ? Math.max(0, Math.min(100, Number(customMm) || 0)) * 2.8346 : MARGINS[margin], repeatRows: repeat === "auto" ? "auto" : Number(repeat), pageNumbers, gridlines, sheets: [...sheets].sort((a, b) => a - b) }
     : null;
   const optKey = JSON.stringify(options);
 
@@ -191,8 +192,18 @@ export default function ExcelToPdf() {
                 { value: "actual", label: "Actual size" },
                 { value: "width", label: "Fit columns to width" },
                 { value: "page", label: "Fit sheet on a page" },
+                { value: "custom", label: "Custom %" },
               ]}
             />
+            {fit === "custom" && (
+              <div className="mt-2 flex items-center gap-2 text-sm">
+                <label htmlFor="x2p-scale" className="text-ink-2">
+                  Print at
+                </label>
+                <input id="x2p-scale" type="number" inputMode="numeric" min={10} max={400} step={5} value={scalePct} onChange={(e) => setScalePct(e.target.value)} className="h-9 w-20 rounded-[8px] border border-line-strong bg-card px-2 font-mono text-sm" />
+                <span className="text-ink-2">% (10–400). Columns that don&rsquo;t fit continue on extra pages — none are dropped.</span>
+              </div>
+            )}
           </div>
           <div>
             <FieldLabel htmlFor="x2p-repeat">Repeat header rows on every page</FieldLabel>

@@ -34,8 +34,8 @@ export default function PrivacyPage() {
           <strong>QR Code Generator</strong> creates codes in your browser. The links, text, contact details and Wi-Fi credentials you enter are not transmitted.
         </li>
         <li>
-          <strong>Word Counter, Case Converter, Markdown Editor, JSON Formatter, URL Encoder, Base64 Encoder, CSV to JSON Converter, UUID Generator, URL Slug Generator, Regex Tester, HTML Formatter, CSS Minifier and Color Picker</strong> work on your text, files and data
-          in your browser. Pasted text, URLs, JSON, CSV, HTML and CSS, regex patterns and test text — including any keys or personal data inside them — are not transmitted or saved.
+          <strong>Word Counter, Case Converter, Text Diff Checker, Markdown Editor, JSON Formatter, URL Encoder, Base64 Encoder, CSV to JSON &amp; JSON to CSV Converter, UUID Generator, URL Slug Generator, Regex Tester, HTML Formatter, CSS Minifier, Color Picker and File Hash Generator</strong> work on your text, files and data
+          in your browser. Pasted text, URLs, JSON, CSV, HTML and CSS, regex patterns, test text, files you hash and their checksums — including any keys or personal data inside them — are not transmitted or saved.
         </li>
         <li>
           <strong>PDF to Word, Word to PDF, PDF to Excel, Excel to PDF, PDF to JPG &amp; PNG, Image Converter, Image to Text (OCR), PDF Editor, PDF Page Organizer, Sign PDF, Protect PDF, Unlock PDF, Watermark PDF, Add Page Numbers and PDF to PowerPoint</strong> convert your documents and images in your
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           your browser, as it would on any website. Local images you pick for a preview stay on your device.
         </li>
         <li>
-          <strong>EMI, GST, Discount, Percentage, Age and Days Between Dates calculators and the Unit Converter</strong> calculate in your browser. Loan details, amounts,
+          <strong>EMI, GST, Discount, Percentage, Age and Days Between Dates calculators, the Number to Words Converter and the Unit Converter</strong> calculate in your browser. Loan details, amounts,
           measurements and dates — including your date of birth — are not transmitted, stored or included in analytics.
         </li>
         <li>

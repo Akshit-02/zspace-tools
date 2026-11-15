@@ -34,7 +34,14 @@ export async function loadPdf(input: ArrayBuffer | Uint8Array, name = "This file
     }
     throw new PdfError("damaged", `${name} couldn't be opened. It may be damaged or use a structure the browser can't read.`);
   }
-  if (doc.getPageCount() === 0) throw new PdfError("empty", `${name} has no pages.`);
+  let count: number;
+  try {
+    count = doc.getPageCount();
+  } catch {
+    // Lenient parsing can succeed on a file whose page tree is missing or broken.
+    throw new PdfError("damaged", `${name} couldn't be opened. It may be damaged or use a structure the browser can't read.`);
+  }
+  if (count === 0) throw new PdfError("empty", `${name} has no pages.`);
   return doc;
 }
 

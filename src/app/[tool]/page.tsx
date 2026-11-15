@@ -141,6 +141,65 @@ export default async function ToolPage({ params }: PageProps<"/[tool]">) {
           </section>
         )}
 
+        {tool.guide && (
+          <section aria-labelledby="guide" className="mt-24">
+            <Eyebrow>Guide</Eyebrow>
+            <h2 id="guide" className="mt-4 font-display text-h2 font-semibold">
+              Understanding the {tool.name.replace(/ Calculator$/, "")} calculator
+            </h2>
+            <div className="mt-10 grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+              <div>
+                <h3 className="text-lg font-bold">What each input means</h3>
+                <dl className="mt-4 divide-y divide-line border-y border-line">
+                  {tool.guide.inputs.map((x) => (
+                    <div key={x.title} className="grid gap-1 py-4 sm:grid-cols-[minmax(0,0.45fr)_minmax(0,1fr)] sm:gap-6">
+                      <dt className="font-medium">{x.title}</dt>
+                      <dd className="text-[0.97rem] text-ink-2">{x.body}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <h3 className="mt-10 text-lg font-bold">How to read the result</h3>
+                <ul className="mt-4 space-y-3 text-[0.97rem] text-ink-2">
+                  {tool.guide.interpret.map((x) => (
+                    <li key={x} className="flex gap-3">
+                      <span aria-hidden className="mt-2.5 h-0.5 w-3 shrink-0 rounded-full bg-orange" />
+                      {x}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="grid content-start gap-6">
+                <div className="rounded-[14px] border border-line bg-card p-6">
+                  <h3 className="text-lg font-bold">Who uses it</h3>
+                  <ul className="mt-3 space-y-2 text-[0.95rem] text-ink-2">
+                    {tool.guide.useCases.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+                {tool.guide.mistakes && tool.guide.mistakes.length > 0 && (
+                  <div className="rounded-[14px] border border-line bg-card p-6">
+                    <h3 className="text-lg font-bold">Common mistakes</h3>
+                    <ul className="mt-3 list-disc space-y-2 pl-5 text-[0.95rem] text-ink-2">
+                      {tool.guide.mistakes.map((x) => (
+                        <li key={x}>{x}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="rounded-[14px] border border-line bg-ivory-2 p-6">
+                  <h3 className="text-lg font-bold">Assumptions and limitations</h3>
+                  <ul className="mt-3 list-disc space-y-2 pl-5 text-[0.95rem] text-ink-2">
+                    {tool.guide.limitations.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <div className="mt-24 grid gap-6 lg:grid-cols-2">
           <section aria-labelledby="specs" className="rounded-[14px] border border-line bg-card p-6 sm:p-8">
             <h2 id="specs" className="font-display text-2xl font-semibold">

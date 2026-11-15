@@ -347,7 +347,7 @@ async function qpdfShow(buf: Buffer, password: string) {
 {
   const page = await ctx.newPage();
   await open(page, "/");
-  for (const [q, want] of [["password protect pdf", "Protect PDF"], ["remove pdf password", "Unlock PDF"], ["watermark", "Watermark PDF"], ["page numbers", "Add Page Numbers"], ["pdf to ppt", "PDF to PowerPoint"]] as const) {
+  for (const [q, want] of [["password protect pdf", "Protect PDF"], ["remove pdf password", "Unlock PDF"], ["watermark", "Add Watermark to PDF"], ["page numbers", "Add Page Numbers"], ["pdf to ppt", "PDF to PowerPoint"]] as const) {
     await page.getByPlaceholder("What would you like to do today?").fill(q);
     const first = page.getByRole("option").first();
     await first.waitFor();
@@ -356,8 +356,8 @@ async function qpdfShow(buf: Buffer, password: string) {
   const titles: Record<string, string> = {
     "protect-pdf": "Protect PDF – Add Password and Encrypt PDF Files Online",
     "unlock-pdf": "Unlock PDF – Remove Password from PDF Online",
-    "watermark-pdf": "Add Watermark to PDF – Text and Image Watermark Online",
-    "add-page-numbers": "Add Page Numbers to PDF – Number PDF Pages Online",
+    "watermark-pdf": "Add Watermark to PDF Online – Free Text &amp; Image Watermark",
+    "add-page-numbers": "Add Page Numbers to PDF Online – Free PDF Page Number Tool",
     "pdf-to-powerpoint": "PDF to PowerPoint Converter – Convert PDF to PPTX Online",
   };
   for (const [slug, title] of Object.entries(titles)) {

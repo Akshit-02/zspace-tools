@@ -1,4 +1,4 @@
-import { Hash, Lock, LockOpen, Presentation, Stamp, FilePenLine, LayoutGrid, Sheet, Signature, Table2, ArrowRightLeft, FileOutput, FilePen, Images, ScanText, Ampersand, Bot, Globe, Network, Share2, Tags, BadgePercent, FileCode, FileCode2, Regex, Binary, Link2 as LinkSlug, Briefcase, Crop, Fingerprint, Palette, PenTool, Pilcrow, Receipt, CalendarDays, Clock, FileSpreadsheet, Landmark, Link, Braces, CaseSensitive, Cake, Code2, ReceiptIndianRupee, Ruler, Combine, FileImage, FileText, ImageIcon, KeyRound, Percent, QrCode, Repeat2, Scaling, Split, Type, Zap, type LucideProps } from "lucide-react";
+import { HousePlus, FastForward, CarFront, Banknote, Scale, KeySquare, FileBadge, ScrollText, IndianRupee, Gauge, Building2, Umbrella, Gift, ReceiptText, Wallet, House, FileMinus, Stethoscope, ChartNoAxesColumnIncreasing, TreePalm, Users, ShieldCheck, CalendarRange, BanknoteArrowDown, Vault, ShoppingCart, Sunset, PiggyBank, CalendarSync, Coins, Target, ChartNoAxesCombined, TrendingUp, ChartSpline, HeartPulse, GraduationCap, HandCoins, RotateCw, FileCheck2, GitCompare, WholeWord, Hash, Lock, LockOpen, Presentation, Stamp, FilePenLine, LayoutGrid, Sheet, Signature, Table2, ArrowRightLeft, FileOutput, FilePen, Images, ScanText, Ampersand, Bot, Globe, Network, Share2, Tags, BadgePercent, FileCode, FileCode2, Regex, Binary, Link2 as LinkSlug, Briefcase, Crop, Fingerprint, Palette, PenTool, Pilcrow, Receipt, CalendarDays, Clock, FileSpreadsheet, Landmark, Link, Braces, CaseSensitive, Cake, Code2, ReceiptIndianRupee, Ruler, Combine, FileImage, FileText, ImageIcon, KeyRound, Percent, QrCode, Repeat2, Scaling, Split, Type, Zap, type LucideProps } from "lucide-react";
 import type { IconName } from "@/lib/tools";
 
 const map = {
@@ -59,6 +59,47 @@ const map = {
   stamp: Stamp,
   numbers: Hash,
   slides: Presentation,
+  words: WholeWord,
+  diff: GitCompare,
+  hash: FileCheck2,
+  rotate: RotateCw,
+  trending: TrendingUp,
+  growth: ChartSpline,
+  heart: HeartPulse,
+  graduation: GraduationCap,
+  tip: HandCoins,
+  piggy: PiggyBank,
+  recurring: CalendarSync,
+  coins: Coins,
+  target: Target,
+  cagr: ChartNoAxesCombined,
+  xirr: CalendarRange,
+  swp: BanknoteArrowDown,
+  ppf: Vault,
+  inflation: ShoppingCart,
+  retirement: Sunset,
+  epf: Building2,
+  nps: Umbrella,
+  gratuity: Gift,
+  "income-tax": ReceiptText,
+  "take-home": Wallet,
+  hra: House,
+  tds: FileMinus,
+  esi: Stethoscope,
+  hike: ChartNoAxesColumnIncreasing,
+  leave: TreePalm,
+  payroll: Users,
+  benefits: ShieldCheck,
+  "loan-eligibility": HousePlus,
+  prepayment: FastForward,
+  "car-loan": CarFront,
+  "personal-loan": Banknote,
+  affordability: Scale,
+  "rent-buy": KeySquare,
+  "stamp-duty": FileBadge,
+  registration: ScrollText,
+  "down-payment": IndianRupee,
+  dti: Gauge,
 } satisfies Record<IconName, React.ComponentType<LucideProps>>;
 
 export function ToolIcon({ name, ...props }: { name: IconName } & LucideProps) {

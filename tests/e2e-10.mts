@@ -486,15 +486,15 @@ const scanTablePdf = await (async () => {
   await open(page, "/");
   const home = await page.locator("main").innerText();
   check("home: popular includes PDF Editor and Sign PDF", home.includes("PDF Editor") && home.includes("Sign PDF"));
-  for (const [q, want] of [["pdf to excel", "PDF to Excel"], ["bank statement to excel", "PDF to Excel"], ["xlsx to pdf", "Excel to PDF"], ["edit pdf", "PDF Editor"], ["add text to pdf", "PDF Editor"], ["rotate pdf", "PDF Page Organizer"], ["delete pdf pages", "PDF Page Organizer"], ["sign pdf", "Sign PDF"], ["e-sign", "Sign PDF"]] as const) {
+  for (const [q, want] of [["pdf to excel", "PDF to Excel"], ["bank statement to excel", "PDF to Excel"], ["xlsx to pdf", "Excel to PDF"], ["edit pdf", "PDF Editor"], ["add text to pdf", "PDF Editor"], ["rotate pdf", "Rotate PDF"], ["delete pdf pages", "PDF Page Organizer"], ["sign pdf", "Sign PDF"], ["e-sign", "Sign PDF"]] as const) {
     await page.getByPlaceholder("What would you like to do today?").fill(q);
     const first = page.getByRole("option").first();
     await first.waitFor();
     check(`search: "${q}" → ${want}`, (await first.innerText()).includes(want), (await first.innerText()).split("\n")[0]);
   }
   const titles: Record<string, string> = {
-    "pdf-to-excel": "PDF to Excel Converter – Convert PDF Tables to XLSX Online",
-    "excel-to-pdf": "Excel to PDF Converter – Convert XLS and XLSX to PDF Online",
+    "pdf-to-excel": "PDF to Excel Converter – Convert PDF to XLSX Online Free",
+    "excel-to-pdf": "Excel to PDF Converter – Convert XLSX to PDF Online Free",
     "pdf-editor": "Edit PDF Online – Add Text, Images, Shapes and Annotations",
     "pdf-organizer": "Organize PDF Pages – Reorder, Rotate, Delete and Extract Pages",
     "sign-pdf": "Sign PDF Online – Add Your Signature to PDF Documents",

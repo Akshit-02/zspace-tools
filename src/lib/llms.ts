@@ -70,6 +70,20 @@ export function buildLlmsFullTxt() {
       "How to use:",
       ...t.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.body}`),
       "",
+      ...(t.guide
+        ? [
+            "Inputs:",
+            ...t.guide.inputs.map((x) => `- ${x.title}: ${x.body}`),
+            "",
+            "Reading the result:",
+            ...t.guide.interpret.map((x) => `- ${x}`),
+            "",
+            "Assumptions and limitations:",
+            ...t.guide.limitations.map((x) => `- ${x}`),
+            "",
+            ...(t.guide.mistakes?.length ? ["Common mistakes:", ...t.guide.mistakes.map((x) => `- ${x}`), ""] : []),
+          ]
+        : []),
       "Specifications:",
       ...t.specs.map((s) => `- ${s.label}: ${s.value}`),
       "",

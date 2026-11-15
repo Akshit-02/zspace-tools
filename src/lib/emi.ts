@@ -157,6 +157,7 @@ export const CURRENCIES = [
   { code: "AED", locale: "en-AE", label: "AED" },
   { code: "SGD", locale: "en-SG", label: "S$ SGD" },
   { code: "AUD", locale: "en-AU", label: "A$ AUD" },
+  { code: "CAD", locale: "en-CA", label: "C$ CAD" },
 ] as const;
 
 export type CurrencyCode = (typeof CURRENCIES)[number]["code"];

@@ -14,7 +14,7 @@ export interface PageSize {
 
 /* ---------------- Page scope ---------------- */
 
-export type Scope = "all" | "first" | "last" | "odd" | "even" | "range";
+export type Scope = "all" | "notFirst" | "first" | "last" | "odd" | "even" | "range";
 
 /** 0-based page indexes for a scope. `range` uses 1-based text like "1-3, 7". */
 export function scopePages(scope: Scope, range: string, total: number): number[] | { error: string } {
@@ -22,6 +22,8 @@ export function scopePages(scope: Scope, range: string, total: number): number[]
   switch (scope) {
     case "all":
       return all;
+    case "notFirst":
+      return all.slice(1);
     case "first":
       return total ? [0] : [];
     case "last":
